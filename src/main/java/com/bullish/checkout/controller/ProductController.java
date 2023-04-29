@@ -16,6 +16,7 @@ public class ProductController {
     @PostMapping
     public String addProduct() {
         return "addProduct";
+
     }
 
     @DeleteMapping

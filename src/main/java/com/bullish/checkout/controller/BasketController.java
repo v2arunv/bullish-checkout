@@ -2,6 +2,7 @@ package com.bullish.checkout.controller;
 
 
 import com.bullish.checkout.Constants;
+import com.bullish.checkout.domain.ProductOperations;
 import org.springframework.web.bind.annotation.*;
 
 /*
@@ -11,6 +12,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(Constants.BASKET_BASE_PATH)
 public class BasketController {
 
+    private final ProductOperations productOperations;
+
+    public BasketController(ProductOperations productOperations) {
+        this.productOperations = productOperations;
+    }
+
     @GetMapping("/checkout")
     public String performCheckout() {
         return "performCheckout";
@@ -18,7 +25,9 @@ public class BasketController {
 
     @PostMapping("/product")
     public String addProduct() {
-        return "addProduct";
+        productOperations.createProduct();
+        return productOperations.getProduct();
+
     }
 
     @DeleteMapping("/product")

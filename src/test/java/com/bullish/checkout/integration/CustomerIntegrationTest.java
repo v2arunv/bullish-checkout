@@ -22,6 +22,6 @@ public class CustomerIntegrationTest {
     public void testAddProductToBasket() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post("/basket/product"))
                 .andExpect(status().isOk())
-                .andExpect(content().string("addProduct"));
+                .andExpect(content().string("1-SAMPLE, "));
     }
 }

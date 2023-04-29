@@ -17,7 +17,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import java.util.stream.Stream;
 
 @Configuration
-@EnableWebSecurity(debug = true)
+@EnableWebSecurity
 public class AuthenticationAndSecurityConfiguration {
 
     @Value( "${api.username}" )
@@ -30,7 +30,7 @@ public class AuthenticationAndSecurityConfiguration {
     private final String[] protectedPaths = Stream.of(Constants.PRODUCT_BASE_PATH, Constants.DEAL_BASE_PATH)
             .map(x -> x+"/**").toArray(String[]::new);
 
-    private final String[] unprotectedPaths = Stream.of(Constants.BASKET_BASE_PATH)
+    private final String[] unprotectedPaths = Stream.of(Constants.BASKET_BASE_PATH, Constants.ERROR_PATH, Constants.H2_UI)
             .map(x -> x+"/**").toArray(String[]::new);
 
 
@@ -59,6 +59,7 @@ public class AuthenticationAndSecurityConfiguration {
 
     @Bean
     public UserDetailsService adminUserDetailsService() {
+        // Dont use defaultPasswordEncoder in PROD.
         UserDetails admin = User.withDefaultPasswordEncoder()
                 .username(username)
                 .password(password)
