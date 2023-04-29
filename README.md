@@ -21,7 +21,7 @@ For your convinience, you can run `setup.sh` which is a helper script that can a
 Administrators and customers obviously require different mechanisms to authenticate themselves. Since no explicit requirements were given regarding authenticating admins, a simple Basic HTTP Auth is used to check if they're admin. The user name is `admin` and the password is `iamadmin` and based on [Basic Auth RFC](https://datatracker.ietf.org/doc/html/rfc7617), they need to be encoded in base64. You then need to add this as a header to your HTTP calls to authenticate yourself
 
 ```
-Authorization: Basic YWRtaW46aWFtYWRtaW4K
+Authorization: Basic YWRtaW46aWFtYWRtaW4=
 ```
 
 Please include them in all your requests. Any **unauthenticated** requests will be treated as customer requests
