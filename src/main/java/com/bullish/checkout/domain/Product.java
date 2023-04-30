@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.CompositeType;
 import org.javamoney.moneta.Money;
 
+import java.util.Set;
+
 @Entity
 @Table(name = "product")
 public class Product {

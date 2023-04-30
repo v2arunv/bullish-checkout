@@ -13,12 +13,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(Constants.DEAL_BASE_PATH)
 public class DealController {
 
-    @PostMapping("/")
+    @PostMapping
     public String addDeal(){
         return "ADD DEAL";
     }
 
-    @DeleteMapping("/")
+    @DeleteMapping
     public String deleteDeal() {
         return  "DELETE DEAL";
     }

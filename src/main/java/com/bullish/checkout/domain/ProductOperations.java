@@ -19,6 +19,7 @@ public class ProductOperations {
 
     public void createProduct() {
         Product product = new Product();
+        product.setId(5L);
         product.setName("SAMPLE");
         product.setPrice(Money.of(
                 BigDecimal.valueOf(99.99),
