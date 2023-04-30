@@ -27,16 +27,32 @@ public class Deal {
     @Column(name = "discount_percentage")
     private BigDecimal discountPercentage;
 
-    @AttributeOverride(
-            name = "flat_discount_amount",
-            column = @Column(name = "flat_discount_amount")
-    )
-    @AttributeOverride(
-            name = "flat_discount_currency",
-            column =  @Column(name = "flat_discount_currency")
-    )
-    @CompositeType(MonetaryAmountType.class)
-    private Money flatDiscount;
+//    @AttributeOverride(
+//            name = "flat_discount_amount",
+//            column = @Column(name = "flat_discount_amount")
+//    )
+//    @AttributeOverride(
+//            name = "flat_discount_currency",
+//            column =  @Column(name = "flat_discount_currency")
+//    )
+//    @CompositeType(MonetaryAmountType.class)
+//    private Money flatDiscount;
+
+    public DealType getType() {
+        return type;
+    }
+
+    public void setType(DealType type) {
+        this.type = type;
+    }
+
+    public Product getProduct() {
+        return product;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
+    }
 
     @ManyToOne
     @MapsId
@@ -75,11 +91,24 @@ public class Deal {
         this.discountPercentage = discountPercentage;
     }
 
-    public Money getFlatDiscount() {
-        return flatDiscount;
-    }
+//    public Money getFlatDiscount() {
+//        return flatDiscount;
+//    }
+//
+//    public void setFlatDiscount(Money flatDiscount) {
+//        this.flatDiscount = flatDiscount;
+//    }
 
-    public void setFlatDiscount(Money flatDiscount) {
-        this.flatDiscount = flatDiscount;
+    @Override
+    public String toString() {
+        return "Deal{" +
+                "id=" + id +
+                ", type=" + type +
+                ", minimumQuantity=" + minimumQuantity +
+                ", maximumQuantity=" + maximumQuantity +
+                ", discountPercentage=" + discountPercentage +
+//                ", flatDiscount=" + flatDiscount +
+                ", product=" + product +
+                '}';
     }
 }

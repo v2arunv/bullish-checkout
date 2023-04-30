@@ -1,9 +1,9 @@
 package com.bullish.checkout.controller;
 import com.bullish.checkout.Constants;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.bullish.checkout.domain.DealOperations;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 
 /*
@@ -13,9 +13,27 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(Constants.DEAL_BASE_PATH)
 public class DealController {
 
+    private DealOperations dealOperations;
+    public DealController(DealOperations dealOperations) {
+        this.dealOperations = dealOperations;
+    }
+
+    @GetMapping
+    public String getDeal(
+            @RequestParam("productId") Optional<String> productId,
+            @RequestParam("id") Optional<String> id
+            ) {
+        if (id.isPresent()) {
+            return dealOperations.getById(id.get());
+        } else if (productId.isPresent()) {
+            return dealOperations.getByProduct(productId.get());
+        }
+        return "Not Found";
+     }
+
     @PostMapping
     public String addDeal(){
-        return "ADD DEAL";
+        return dealOperations.createDeal().toString();
     }
 
     @DeleteMapping
