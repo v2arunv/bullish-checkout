@@ -1,4 +1,5 @@
 package com.bullish.checkout.controller;
+import com.bullish.checkout.BusinessException;
 import com.bullish.checkout.Constants;
 import com.bullish.checkout.domain.DealOperations;
 import org.springframework.web.bind.annotation.*;
@@ -32,7 +33,7 @@ public class DealController {
      }
 
     @PostMapping
-    public String addDeal(){
+    public String addDeal() {
         return dealOperations.createDeal().toString();
     }
 

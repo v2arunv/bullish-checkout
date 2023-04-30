@@ -1,5 +1,6 @@
 package com.bullish.checkout.domain;
 
+import com.bullish.checkout.InvalidDealException;
 import io.hypersistence.utils.hibernate.type.money.MonetaryAmountType;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CompositeType;
@@ -38,6 +39,11 @@ public class Deal {
     @CompositeType(MonetaryAmountType.class)
     private Money flatDiscount;
 
+    @ManyToOne
+    @MapsId
+    @JoinColumn(name = "product_id")
+    private Product product;
+
     public DealType getType() {
         return type;
     }
@@ -54,12 +60,7 @@ public class Deal {
         this.product = product;
     }
 
-    @ManyToOne
-    @MapsId
-    @JoinColumn(name = "product_id")
-    private Product product;
-
-    public void setId(Long id) {
+    private void setId(Long id) {
         this.id = id;
     }
 
@@ -71,7 +72,7 @@ public class Deal {
         return minimumQuantity;
     }
 
-    public void setMinimumQuantity(Long minimumQuantity) {
+    private void setMinimumQuantity(Long minimumQuantity) {
         this.minimumQuantity = minimumQuantity;
     }
 
@@ -79,7 +80,7 @@ public class Deal {
         return maximumQuantity;
     }
 
-    public void setMaximumQuantity(Long maximumQuantity) {
+    private void setMaximumQuantity(Long maximumQuantity) {
         this.maximumQuantity = maximumQuantity;
     }
 
@@ -87,7 +88,7 @@ public class Deal {
         return discountPercentage;
     }
 
-    public void setDiscountPercentage(BigDecimal discountPercentage) {
+    private void setDiscountPercentage(BigDecimal discountPercentage) {
         this.discountPercentage = discountPercentage;
     }
 
@@ -95,7 +96,7 @@ public class Deal {
         return flatDiscount;
     }
 
-    public void setFlatDiscount(Money flatDiscount) {
+    private void setFlatDiscount(Money flatDiscount) {
         this.flatDiscount = flatDiscount;
     }
 
@@ -110,5 +111,63 @@ public class Deal {
                 ", flatDiscount=" + flatDiscount +
                 ", product=" + product +
                 '}';
+    }
+
+    public static class Builder {
+
+        private Product product;
+        private DealType dealType;
+
+        private Long minimumQuantity;
+        private Long maximumQuantity;
+
+        private Money flatDiscount;
+
+        private BigDecimal discountPercentage;
+
+        public Builder(Product product, DealType dealType) {
+            this.product = product;
+            this.dealType = dealType;
+        }
+
+        public Builder minimumQuantity(Long quantity) {
+            this.minimumQuantity = quantity;
+            return this;
+        }
+
+        public Builder maximumQuantity(Long quantity) {
+            this.maximumQuantity = quantity;
+            return this;
+        }
+
+        public Builder flatDiscount(Money discount) throws InvalidDealException {
+            if (this.dealType == DealType.PERCENTAGE) {
+                throw new InvalidDealException("This deal is a percentage type. A flat discount amount cannot be set");
+            }
+            this.flatDiscount = discount;
+            return this;
+        }
+
+        public Builder discountPercentage(BigDecimal percentage) throws InvalidDealException {
+            if (this.dealType == DealType.FLAT_AMOUNT) {
+                throw new InvalidDealException("This deal is a flat discount type. A flat discount amount cannot be set");
+            }
+            this.discountPercentage = percentage;
+            return this;
+        }
+
+        public Deal build() {
+            Deal deal =  new Deal();
+            deal.setProduct(product);
+            deal.setType(dealType);
+            deal.setMinimumQuantity(minimumQuantity);
+            deal.setMaximumQuantity(maximumQuantity);
+            if (dealType == DealType.FLAT_AMOUNT) {
+                deal.setFlatDiscount(flatDiscount);
+            } else {
+                deal.setDiscountPercentage(discountPercentage);
+            }
+            return deal;
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.bullish.checkout.domain;
 
+import com.bullish.checkout.BusinessException;
 import org.javamoney.moneta.Money;
 import org.springframework.stereotype.Component;
 
@@ -17,17 +18,14 @@ public class DealOperations {
         this.productRepository = productRepository;
     }
 
-    public Deal createDeal() {
+    public Deal createDeal() throws BusinessException {
         Product product = productRepository.findById(1L).orElseThrow();
 
-        Deal deal = new Deal();
-        deal.setType(DealType.PERCENTAGE);
-        deal.setDiscountPercentage(BigDecimal.valueOf(50));
-        deal.setMinimumQuantity(2L);
-        deal.setProduct(product);
-        deal.setFlatDiscount(
-                Money.of(BigDecimal.valueOf(100), "USD")
-        );
+        Deal deal = new Deal.Builder(product, DealType.PERCENTAGE)
+                .discountPercentage(BigDecimal.valueOf(50))
+                .minimumQuantity(2L)
+                .build();
+        
 
         return dealRepository.save(deal);
 
