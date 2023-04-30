@@ -25,9 +25,7 @@ public class BasketController {
 
     @PostMapping("/product")
     public String addProduct() {
-        productOperations.createProduct();
-        return productOperations.getProduct();
-
+        return "addProdcut";
     }
 
     @DeleteMapping("/product")

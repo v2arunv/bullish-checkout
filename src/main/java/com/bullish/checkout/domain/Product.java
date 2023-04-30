@@ -74,10 +74,10 @@ public class Product {
 
         public Builder price(BigDecimal amount) {
             /*
-                We're going to assume that all products are denominated in USD
+                We're going to assume that all products are denominated in HKD
                 We can always extend it to something else based on the requirements,
                 but for the moment, there are no requirements to support multiple currencies,
-                and it is therefore an internal detail that doesnt need to be exposed
+                and it is therefore an internal detail that doesn't need to be exposed
             */
             this.price = Money.of(
                     amount,
