@@ -5,7 +5,7 @@ INSERT INTO product(id,
 VALUES (1,
         'Macbook Pro',
         1299,
-        'USD');
+        'HKD');
 
 INSERT INTO product(id,
                     name,
@@ -14,7 +14,7 @@ INSERT INTO product(id,
 VALUES (2,
         'iPhone',
         999,
-        'USD');
+        'HKD');
 
 INSERT INTO product(id,
                     name,
@@ -23,4 +23,4 @@ INSERT INTO product(id,
 VALUES (3,
         'AirPods Pro',
         499,
-        'USD');
+        'HKD');

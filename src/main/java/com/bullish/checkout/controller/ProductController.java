@@ -1,10 +1,8 @@
 package com.bullish.checkout.controller;
 
 import com.bullish.checkout.Constants;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.bullish.checkout.domain.ProductOperations;
+import org.springframework.web.bind.annotation.*;
 
 /*
     Administrative endpoints to add and remove products
@@ -13,14 +11,20 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(Constants.PRODUCT_BASE_PATH)
 public class ProductController {
 
+    private final ProductOperations productOperations;
+
+    public ProductController(ProductOperations productOperations){
+        this.productOperations = productOperations;
+    }
+
     @PostMapping
     public String addProduct() {
-        return "addProduct";
+        return productOperations.createProduct().toString();
 
     }
 
     @DeleteMapping
-    public String deleteProduct() {
-        return "deleteProduct";
+    public void deleteProduct() {
+        productOperations.deleteProduct(1L);
     }
 }

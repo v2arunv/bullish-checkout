@@ -38,7 +38,7 @@ public class DealController {
     }
 
     @DeleteMapping
-    public String deleteDeal() {
-        return  "DELETE DEAL";
+    public void deleteDeal() {
+        dealOperations.deleteDeal(1L);
     }
 }

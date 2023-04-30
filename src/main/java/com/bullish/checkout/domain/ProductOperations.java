@@ -1,12 +1,11 @@
 package com.bullish.checkout.domain;
 
-import org.javamoney.moneta.Money;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.bullish.checkout.BusinessException;
+import com.bullish.checkout.ProductNotFoundException;
 import org.springframework.stereotype.Component;
 
-import javax.money.CurrencyUnit;
-import javax.money.Monetary;
 import java.math.BigDecimal;
+import java.util.function.Supplier;
 
 @Component
 public class ProductOperations {
@@ -17,16 +16,14 @@ public class ProductOperations {
         this.productRepository = productRepository;
     }
 
-    public void createProduct() {
-        Product product = new Product();
-        product.setId(5L);
-        product.setName("SAMPLE");
-        product.setPrice(Money.of(
-                BigDecimal.valueOf(99.99),
-                Monetary.getCurrency("USD")
-        ));
+    public Product createProduct() {
 
-        productRepository.save(product);
+        Product product = new Product.Builder()
+                .price(BigDecimal.valueOf(99.99))
+                .name("VVPods Pro")
+                .build();
+
+        return productRepository.save(product);
     }
 
     public String getProduct() {
@@ -34,15 +31,18 @@ public class ProductOperations {
         productRepository.findAll()
                 .forEach(prod -> {
                     result
-                            .append(prod.getId())
-                            .append("-")
-                            .append(prod.getName())
-                            .append("-")
-                            .append(prod.getPrice().getCurrency().getCurrencyCode())
-                            .append(prod.getPrice().getNumberStripped().toString())
-                            .append(", ");
+                            .append(prod.toString())
+                            .append("\n");
                 });
 
         return result.toString();
+    }
+
+    public void deleteProduct(Long id) throws BusinessException {
+        Product product = productRepository
+                .findById(id)
+                .orElseThrow((Supplier<BusinessException>) () -> new ProductNotFoundException(id));
+
+        productRepository.delete(product);
     }
 }

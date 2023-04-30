@@ -1,5 +1,6 @@
 package com.bullish.checkout.domain;
 
+import com.bullish.checkout.Constants;
 import com.bullish.checkout.InvalidDealException;
 import io.hypersistence.utils.hibernate.type.money.MonetaryAmountType;
 import jakarta.persistence.*;
@@ -140,11 +141,17 @@ public class Deal {
             return this;
         }
 
-        public Builder flatDiscount(Money discount) throws InvalidDealException {
+        public Builder flatDiscount(BigDecimal amount) throws InvalidDealException {
+            /*
+                We're going to assume that all products are denominated in USD
+                We can always extend it to something else based on the requirements,
+                but for the moment, there are no requirements to support multiple currencies,
+                and it is therefore an internal detail that doesn't need to be exposed
+            */
             if (this.dealType == DealType.PERCENTAGE) {
                 throw new InvalidDealException("This deal is a percentage type. A flat discount amount cannot be set");
             }
-            this.flatDiscount = discount;
+            this.flatDiscount = Money.of(amount, Constants.DEFAULT_CURRENCY);
             return this;
         }
 

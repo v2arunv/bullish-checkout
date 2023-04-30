@@ -1,5 +1,8 @@
 package com.bullish.checkout;
 
+import javax.money.CurrencyUnit;
+import javax.money.Monetary;
+
 public class Constants {
 
     // Storing all reused string constants
@@ -9,4 +12,8 @@ public class Constants {
 
     public static final String ERROR_PATH = "/error";
     public static final String H2_UI = "/h2";
+
+    // Currencies
+    public static final CurrencyUnit DEFAULT_CURRENCY = Monetary.getCurrency("HKD");
+
 }
