@@ -14,8 +14,8 @@ CREATE TABLE deal (
     minimum_quantity number not null,
     maximum_quantity number,
     discount_percentage decimal,
---     flat_discount_amount decimal,
---     flat_discount_currency varchar(100)
+    flat_discount_amount decimal,
+    flat_discount_currency varchar(100),
     product_id int not null,
     FOREIGN KEY (product_id) references product(id)
 );

@@ -27,16 +27,16 @@ public class Deal {
     @Column(name = "discount_percentage")
     private BigDecimal discountPercentage;
 
-//    @AttributeOverride(
-//            name = "flat_discount_amount",
-//            column = @Column(name = "flat_discount_amount")
-//    )
-//    @AttributeOverride(
-//            name = "flat_discount_currency",
-//            column =  @Column(name = "flat_discount_currency")
-//    )
-//    @CompositeType(MonetaryAmountType.class)
-//    private Money flatDiscount;
+    @AttributeOverride(
+            name = "amount",
+            column = @Column(name = "flat_discount_amount")
+    )
+    @AttributeOverride(
+            name = "currency",
+            column =  @Column(name = "flat_discount_currency")
+    )
+    @CompositeType(MonetaryAmountType.class)
+    private Money flatDiscount;
 
     public DealType getType() {
         return type;
@@ -91,13 +91,13 @@ public class Deal {
         this.discountPercentage = discountPercentage;
     }
 
-//    public Money getFlatDiscount() {
-//        return flatDiscount;
-//    }
-//
-//    public void setFlatDiscount(Money flatDiscount) {
-//        this.flatDiscount = flatDiscount;
-//    }
+    public Money getFlatDiscount() {
+        return flatDiscount;
+    }
+
+    public void setFlatDiscount(Money flatDiscount) {
+        this.flatDiscount = flatDiscount;
+    }
 
     @Override
     public String toString() {
@@ -107,7 +107,7 @@ public class Deal {
                 ", minimumQuantity=" + minimumQuantity +
                 ", maximumQuantity=" + maximumQuantity +
                 ", discountPercentage=" + discountPercentage +
-//                ", flatDiscount=" + flatDiscount +
+                ", flatDiscount=" + flatDiscount +
                 ", product=" + product +
                 '}';
     }

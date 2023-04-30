@@ -1,5 +1,6 @@
 package com.bullish.checkout.domain;
 
+import org.javamoney.moneta.Money;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -24,6 +25,9 @@ public class DealOperations {
         deal.setDiscountPercentage(BigDecimal.valueOf(50));
         deal.setMinimumQuantity(2L);
         deal.setProduct(product);
+        deal.setFlatDiscount(
+                Money.of(BigDecimal.valueOf(100), "USD")
+        );
 
         return dealRepository.save(deal);
 
