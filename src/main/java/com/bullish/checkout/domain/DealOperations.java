@@ -36,7 +36,8 @@ public class DealOperations {
     }
 
     public String getByProduct(String productId) {
-        return dealRepository.findAllByProductId(Long.parseLong(productId)).toString();
+        Product product = productRepository.findById(Long.parseLong(productId)).get();
+        return dealRepository.findAllByProduct(product).toString();
     }
 
     public void deleteDeal(Long id) throws BusinessException {

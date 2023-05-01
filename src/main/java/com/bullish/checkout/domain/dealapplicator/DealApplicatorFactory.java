@@ -1,16 +1,15 @@
 package com.bullish.checkout.domain.dealapplicator;
 
-import com.bullish.checkout.domain.*;
-import org.springframework.stereotype.Component;
+import com.bullish.checkout.domain.Basket;
+import com.bullish.checkout.domain.DealRepository;
+import com.bullish.checkout.domain.ProductRepository;
 
-import java.util.List;
+public abstract class DealApplicatorFactory {
 
-@Component
-public class DealApplicatorFactory {
+    protected final DealRepository dealRepository;
+    protected final ProductRepository productRepository;
 
-    private final DealRepository dealRepository;
-
-    private final ProductRepository productRepository;
+    public abstract StandardDealApplicator createStandardDealApplicator(Basket basket);
 
     public DealApplicatorFactory(
             DealRepository dealRepository,
@@ -20,20 +19,6 @@ public class DealApplicatorFactory {
         this.productRepository = productRepository;
     }
 
-    public StandardDealApplicator getStandardDealApplicator(Basket basket) {
-        List<BasketLineItemWithDeal> lineItems = basket.getBasketLineItems()
-                .stream()
-                .map(this::createLineItemWithDeal)
-                .toList();
-
-        BasketCheckout checkout = new BasketCheckout(lineItems);
-        return new StandardDealApplicator(checkout);
-    }
-
-    private BasketLineItemWithDeal createLineItemWithDeal(BasketLineItem basketLineItem) {
-        List<Deal> eligibleDeals = dealRepository.findAllByProductId(basketLineItem.getProduct().getId());
-        return new BasketLineItemWithDeal(basketLineItem, eligibleDeals);
-    }
 
 
 }

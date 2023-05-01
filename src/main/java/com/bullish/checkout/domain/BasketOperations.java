@@ -1,6 +1,7 @@
 package com.bullish.checkout.domain;
 
 import com.bullish.checkout.domain.dealapplicator.DealApplicatorFactory;
+import com.bullish.checkout.domain.dealapplicator.StandardDealApplicatorFactory;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -15,14 +16,14 @@ public class BasketOperations {
     private final BasketRepository basketRepository;
     private final BasketLineItemRepository basketLineItemRepository;
 
-    private final DealApplicatorFactory dealApplicatorFactory;
+    private final StandardDealApplicatorFactory dealApplicatorFactory;
 
     public BasketOperations(
             DealRepository dealRepository,
             ProductRepository productRepository,
             BasketRepository basketRepository,
             BasketLineItemRepository basketLineItemRepository,
-            DealApplicatorFactory dealApplicatorFactory
+            StandardDealApplicatorFactory dealApplicatorFactory
     ) {
         this.dealRepository = dealRepository;
         this.productRepository = productRepository;
@@ -42,7 +43,7 @@ public class BasketOperations {
     public BasketLineItem addToBasket() {
         Basket basket = basketRepository.findById(1L).get();
 
-        Product product = productRepository.findById(1L).get();
+        Product product = productRepository.findById(3L).get();
 
         BasketLineItem basketLineItem = new BasketLineItem();
         basketLineItem.setBasket(basket);
@@ -62,7 +63,7 @@ public class BasketOperations {
         Basket basket = basketRepository.findById(Long.valueOf(id)).get();
 
         return dealApplicatorFactory
-                .getStandardDealApplicator(basket)
+                .createStandardDealApplicator(basket)
                 .calculate();
     }
 }

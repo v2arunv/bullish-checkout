@@ -22,7 +22,6 @@ public class StandardDealApplicator implements DealApplicator {
         this.basketCheckout = basketCheckout;
     }
 
-
     @Override
     public BasketCheckout calculate() {
         /*
@@ -47,7 +46,7 @@ public class StandardDealApplicator implements DealApplicator {
 
     private Money calculateLineItemDiscount(Money amount, BasketLineItemWithDeal basketLineItemWithDeal) {
         // We can change startingDiscount to something else in case, we want to offer a blanket discount for a line item
-        Money startingDiscount = Money.of(0, basketLineItemWithDeal.getOriginalPrice().getCurrency());
+        Money startingDiscount = Money.of(0, Constants.DEFAULT_CURRENCY);
 
         /*
             We can have multiple ways to apply deals for each line item, such as:
@@ -59,23 +58,22 @@ public class StandardDealApplicator implements DealApplicator {
 
         return basketLineItemWithDeal.getDeals()
                 .stream()
-                .reduce(
-                        startingDiscount,
-                        (money, deal) -> this.applyDealOnLineItem(deal, basketLineItemWithDeal),
-                        this::pickHighestDiscount
-                );
-
+                .map(deal -> this.applyDealOnLineItem(deal, basketLineItemWithDeal))
+                .max(this::pickHighestDiscount)
+                .orElse(startingDiscount);
     }
 
-    private Money pickHighestDiscount(Money discount1, Money discount2) {
+    private int pickHighestDiscount(Money discount1, Money discount2) {
         if (discount1.isGreaterThan(discount2)) {
-            return discount1;
+            return 1;
+        } else if (discount2.isGreaterThan(discount1)) {
+            return -1;
         }
-        return discount2;
+        return 0;
     }
 
     private Money applyDealOnLineItem(Deal deal, BasketLineItemWithDeal basketLineItemWithDeal) {
-        CurrencyUnit currency = basketLineItemWithDeal.getBasketLineItem().getProduct().getPrice().getCurrency();
+        CurrencyUnit currency = Constants.DEFAULT_CURRENCY;
         int itemQuantity = basketLineItemWithDeal.getBasketLineItem().getQuantity();
         Money discount = Money.of(0, currency);
 

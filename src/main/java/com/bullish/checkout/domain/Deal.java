@@ -41,7 +41,6 @@ public class Deal {
     private Money flatDiscount;
 
     @ManyToOne
-    @MapsId
     @JoinColumn(name = "product_id")
     private Product product;
 
