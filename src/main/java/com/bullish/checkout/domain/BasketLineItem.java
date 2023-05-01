@@ -1,36 +1,65 @@
 package com.bullish.checkout.domain;
 
-import org.javamoney.moneta.Money;
+import jakarta.persistence.*;
 
-import java.io.Serializable;
+@Entity
+@Table(name = "basket_line_item")
+public class BasketLineItem {
 
-public class BasketLineItem implements Serializable {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
-    private static final long serialVersionUID = -5032673345470297050L;
+    @ManyToOne
+    @JoinColumn(name = "basket_id")
+    private Basket basket;
+    @ManyToOne
+    @JoinColumn(name = "product_id")
+    private Product product;
 
-    private final Product product;
+    // TODO: Add deal here
+
+    @Column(name = "quantity")
     private int quantity;
-    public BasketLineItem(Product product, int quantity) {
-        this.product = product;
-        this.quantity = quantity;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Basket getBasket() {
+        return basket;
+    }
+
+    public void setBasket(Basket basket) {
+        this.basket = basket;
     }
 
     public Product getProduct() {
         return product;
     }
 
+    public void setProduct(Product product) {
+        this.product = product;
+    }
+
     public int getQuantity() {
         return quantity;
     }
 
-    public Money calculateFullPrice() {
-        return product.getPrice().multiply(quantity);
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 
     @Override
     public String toString() {
         return "BasketLineItem{" +
-                "product=" + product +
+                "id=" + id +
+                ", basket=" + basket.getId() +
+                ", product=" + product +
                 ", quantity=" + quantity +
                 '}';
     }

@@ -17,6 +17,11 @@ public class ProductController {
         this.productOperations = productOperations;
     }
 
+    @GetMapping("/{id}")
+    public String getProduct(@PathVariable String id) {
+        return productOperations.getProduct(id);
+    }
+
     @PostMapping
     public String addProduct() {
         return productOperations.createProduct().toString();

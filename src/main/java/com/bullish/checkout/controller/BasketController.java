@@ -19,6 +19,11 @@ public class BasketController {
         this.basketOperations = basketOperations;
     }
 
+    @GetMapping("/{id}")
+    public String getBasket(@PathVariable String id) {
+        return basketOperations.getBasket(id).toString();
+    }
+
     @GetMapping("/checkout")
     public String performCheckout() {
         return "performCheckout";
@@ -31,7 +36,7 @@ public class BasketController {
 
     @PostMapping("/product")
     public String addProduct() {
-        return "addProdcut";
+        return basketOperations.addToBasket().toString();
     }
 
     @DeleteMapping("/product")

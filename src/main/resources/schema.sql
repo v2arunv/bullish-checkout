@@ -1,5 +1,7 @@
 DROP TABLE IF EXISTS deal CASCADE;
 DROP TABLE IF EXISTS product CASCADE;
+DROP TABLE IF EXISTS basket CASCADE;
+DROP TABLE IF EXISTS basket_line_item CASCADE;
 
 CREATE TABLE product (
     id int not null primary key AUTO_INCREMENT,
@@ -18,6 +20,20 @@ CREATE TABLE deal (
     flat_discount_currency varchar(100),
     product_id int not null,
     FOREIGN KEY (product_id) references product(id)
+);
+
+CREATE TABLE basket (
+    id int not null primary key AUTO_INCREMENT,
+    created_at datetime DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE basket_line_item (
+    id int not null primary key AUTO_INCREMENT,
+    quantity int not null,
+    product_id int not null,
+    basket_id int not null,
+    FOREIGN KEY (product_id) references product(id),
+    FOREIGN KEY (basket_id) references basket(id)
 );
 
 alter sequence product_seq restart with 5;

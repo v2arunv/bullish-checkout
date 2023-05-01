@@ -3,6 +3,8 @@ package com.bullish.checkout.domain;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CompositeType;
 
+import java.util.Set;
+
 @Entity
 @Table(name = "basket")
 public class Basket {
@@ -11,35 +13,22 @@ public class Basket {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @AttributeOverride(
-            name = "product",
-            column = @Column(name = "product_id")
-    )
-    @AttributeOverride(
-            name = "quantity",
-            column =  @Column(name = "product_quantity")
-    )
-    @CompositeType(BasketLineItemType.class)
-    private BasketLineItem basketLineItem;
-
+    @OneToMany(mappedBy = "basket")
+    private Set<BasketLineItem> basketLineItems;
 
     public Long getId() {
         return id;
     }
 
-    public BasketLineItem getBasketLineItem() {
-        return basketLineItem;
-    }
-
-    public void setBasketLineItem(BasketLineItem basketLineItem) {
-        this.basketLineItem = basketLineItem;
+    public Set<BasketLineItem> getBasketLineItems() {
+        return basketLineItems;
     }
 
     @Override
     public String toString() {
         return "Basket{" +
                 "id=" + id +
-                ", basketLineItem=" + basketLineItem +
+                ", basketLineItems=" + basketLineItems +
                 '}';
     }
 }

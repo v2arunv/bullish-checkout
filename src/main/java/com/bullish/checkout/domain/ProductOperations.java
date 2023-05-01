@@ -38,6 +38,10 @@ public class ProductOperations {
         return result.toString();
     }
 
+    public String getProduct(String id) {
+        return productRepository.findById(Long.parseLong(id)).get().toString();
+    }
+
     public void deleteProduct(Long id) throws BusinessException {
         Product product = productRepository
                 .findById(id)
