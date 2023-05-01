@@ -30,11 +30,11 @@ public class StandardDealApplicator implements DealApplicator {
            1) This is an assumption we can make since we've already established that all products have the same currency
            2) We can change startingDiscount to something else in case, we want to offer a blanket discount for a basket
          */
-        Money totalDiscount = Money.of(0, Constants.DEFAULT_CURRENCY);
+        Money startingDiscount = Money.of(0, Constants.DEFAULT_CURRENCY);
 
         // Calculate total discount
-        basketCheckout.getLineItemWithDeals().stream()
-                .reduce(totalDiscount, this::calculateLineItemDiscount, Money::add);
+        Money totalDiscount = basketCheckout.getLineItemWithDeals().stream()
+                .reduce(startingDiscount, this::calculateLineItemDiscount, Money::add);
 
         // Calculate net amount for basket
         Money netAmount =  basketCheckout.getTotalAmount().subtract(totalDiscount);
@@ -64,6 +64,7 @@ public class StandardDealApplicator implements DealApplicator {
                         (money, deal) -> this.applyDealOnLineItem(deal, basketLineItemWithDeal),
                         this::pickHighestDiscount
                 );
+
     }
 
     private Money pickHighestDiscount(Money discount1, Money discount2) {

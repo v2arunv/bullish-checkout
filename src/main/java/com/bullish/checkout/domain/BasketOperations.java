@@ -62,7 +62,7 @@ public class BasketOperations {
         Basket basket = basketRepository.findById(Long.valueOf(id)).get();
 
         return dealApplicatorFactory
-                .getStandardDeal(basket)
+                .getStandardDealApplicator(basket)
                 .calculate();
     }
 }

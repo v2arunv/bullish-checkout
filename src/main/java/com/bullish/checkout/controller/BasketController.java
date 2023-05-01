@@ -24,7 +24,7 @@ public class BasketController {
         return basketOperations.getBasket(id).toString();
     }
 
-    @PostMapping("/checkout/{id}")
+    @PostMapping("/{id}/checkout")
     public String performCheckout(@PathVariable String id) {
         return basketOperations.checkout(id).toString();
     }

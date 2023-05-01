@@ -20,7 +20,7 @@ public class DealApplicatorFactory {
         this.productRepository = productRepository;
     }
 
-    public StandardDealApplicator getStandardDeal(Basket basket) {
+    public StandardDealApplicator getStandardDealApplicator(Basket basket) {
         List<BasketLineItemWithDeal> lineItems = basket.getBasketLineItems()
                 .stream()
                 .map(this::createLineItemWithDeal)
@@ -28,8 +28,6 @@ public class DealApplicatorFactory {
 
         BasketCheckout checkout = new BasketCheckout(lineItems);
         return new StandardDealApplicator(checkout);
-
-
     }
 
     private BasketLineItemWithDeal createLineItemWithDeal(BasketLineItem basketLineItem) {
