@@ -15,7 +15,7 @@ public class Basket {
     @OneToMany(mappedBy = "basket")
     private Set<BasketLineItem> basketLineItems;
 
-    public Basket() {
+    private Basket() {
         this.basketLineItems = Set.of();
     }
 
@@ -33,6 +33,22 @@ public class Basket {
                 "id=" + id +
                 ", basketLineItems=" + basketLineItems +
                 '}';
+    }
+
+    public static class Builder {
+
+        private static Set<BasketLineItem> basketLineItems;
+
+        private final Basket basket;
+
+        public Builder() {
+            this.basket = new Basket();
+        }
+
+        public Basket build() {
+            return this.basket;
+        }
+
     }
 
 

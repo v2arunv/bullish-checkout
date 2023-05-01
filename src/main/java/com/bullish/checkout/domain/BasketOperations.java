@@ -1,7 +1,9 @@
 package com.bullish.checkout.domain;
 
+import com.bullish.checkout.BasketNotFoundException;
 import com.bullish.checkout.BusinessException;
 import com.bullish.checkout.ProductNotFoundException;
+import com.bullish.checkout.ProductNotInBasketException;
 import com.bullish.checkout.domain.dealapplicator.StandardDealApplicatorFactory;
 import org.springframework.stereotype.Component;
 
@@ -9,9 +11,6 @@ import java.util.function.Supplier;
 
 @Component
 public class BasketOperations {
-
-    private final DealRepository dealRepository;
-
     private final ProductRepository productRepository;
 
 
@@ -22,21 +21,19 @@ public class BasketOperations {
     private final StandardDealApplicatorFactory dealApplicatorFactory;
 
     public BasketOperations(
-            DealRepository dealRepository,
             ProductRepository productRepository,
             BasketRepository basketRepository,
             BasketLineItemRepository basketLineItemRepository,
             StandardDealApplicatorFactory dealApplicatorFactory
     ) {
-        this.dealRepository = dealRepository;
         this.productRepository = productRepository;
         this.basketRepository = basketRepository;
         this.basketLineItemRepository = basketLineItemRepository;
         this.dealApplicatorFactory = dealApplicatorFactory;
     }
 
-    public Basket createBasket(){
-        Basket basket = new Basket();
+    public Basket createBasket() {
+        Basket basket = new Basket.Builder().build();
 
         basketRepository.save(basket);
 
@@ -44,27 +41,32 @@ public class BasketOperations {
     }
 
     public Basket addToBasket(Long basketId, Long productId, int quantity) {
-        Basket basket = basketRepository.findById(basketId).get();
+        Basket basket = basketRepository.findById(basketId)
+                .orElseThrow((Supplier<BusinessException>) () -> new BasketNotFoundException(basketId));
 
-        Product product = productRepository.findById(productId).get();
+        Product product = productRepository.findById(productId)
+                .orElseThrow((Supplier<BusinessException>) () -> new ProductNotFoundException(productId));
 
-        BasketLineItem basketLineItem = new BasketLineItem();
-        basketLineItem.setBasket(basket);
-        basketLineItem.setProduct(product);
-        basketLineItem.setQuantity(quantity);
+        BasketLineItem basketLineItem = new BasketLineItem.Builder(basket)
+                .product(product)
+                .quantity(quantity)
+                .build();
 
         basketLineItemRepository.save(basketLineItem);
         return basket;
     }
 
     public Basket getBasket(Long id) {
-        Basket basket = basketRepository.findById(id).get();
+        Basket basket = basketRepository.findById(id)
+                .orElseThrow((Supplier<BusinessException>) () -> new BasketNotFoundException(id));
+
 
         return basket;
     }
 
     public BasketCheckout checkout(Long id) {
-        Basket basket = basketRepository.findById(id).get();
+        Basket basket = basketRepository.findById(id)
+                .orElseThrow((Supplier<BusinessException>) () -> new BasketNotFoundException(id));
 
         return dealApplicatorFactory
                 .createStandardDealApplicator(basket)
@@ -72,23 +74,29 @@ public class BasketOperations {
     }
 
     public void deleteBasket(Long id) {
-        basketRepository.deleteById(id);
+        Basket basket = basketRepository.findById(id)
+                .orElseThrow((Supplier<BusinessException>) () -> new BasketNotFoundException(id));
+
+        basketRepository.delete(basket);
+
     }
 
     public Basket patchProductInBasket(Long basketId, Long productId, int quantity) {
         Basket basket = basketRepository.findById(basketId).get();
 
-        BasketLineItem item =  basket.getBasketLineItems()
+        BasketLineItem item = basket.getBasketLineItems()
                 .stream()
                 .filter(x -> x.getProduct().getId().equals(productId))
                 .findFirst()
-                .orElseThrow((Supplier<BusinessException>) () -> new ProductNotFoundException(productId));
+                .orElseThrow((Supplier<BusinessException>) () -> new ProductNotInBasketException(productId));
 
         if (quantity == 0) {
             basketLineItemRepository.delete(item);
         } else {
-            item.setQuantity(quantity);
-            basketLineItemRepository.save(item);
+            BasketLineItem updatedItem = new BasketLineItem.Updater(item)
+                    .quantity(quantity)
+                    .update();
+            basketLineItemRepository.save(updatedItem);
         }
         return basket;
     }

@@ -30,6 +30,11 @@ public class CustomerIntegrationTest {
                 .andExpect(jsonPath("$.id").value("1"));
 
     }
+
+    @Test
+    public void testAddOneProduct() throws Exception {
+
+    }
     @Test
     public void testAddProductToBasket() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post("/basket/product"))

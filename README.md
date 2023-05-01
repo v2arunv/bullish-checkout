@@ -24,6 +24,7 @@ For your convinience, you can run `setup.sh` which is a helper script that can a
 
 **Deals**: There are several ways to structure discounts/deals (such as a flat discount or a percentage amount for a given product) and there are several ways to apply them. We have to also consider what needs to be done when a product has multiple applicable/eligible deals. There needs to be a mechanism that governs how they are applied at checkout. Refer to `dealapplicator` to understand how this has been structured
 
+**Money/Amounts/Price**: Money here is represented using [Java Money](https://javamoney.github.io/ri.html) and a reasonable assumption is being made that the currency of choice is Hong Kong Dollar. So, all products and deals are assumed to have prices in HKD
 
 
 ## Authentication

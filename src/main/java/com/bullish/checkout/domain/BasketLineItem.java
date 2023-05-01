@@ -26,7 +26,7 @@ public class BasketLineItem {
         return id;
     }
 
-    public void setId(Long id) {
+    private void setId(Long id) {
         this.id = id;
     }
 
@@ -34,7 +34,7 @@ public class BasketLineItem {
         return basket;
     }
 
-    public void setBasket(Basket basket) {
+    private void setBasket(Basket basket) {
         this.basket = basket;
     }
 
@@ -42,7 +42,7 @@ public class BasketLineItem {
         return product;
     }
 
-    public void setProduct(Product product) {
+    private void setProduct(Product product) {
         this.product = product;
     }
 
@@ -50,7 +50,7 @@ public class BasketLineItem {
         return quantity;
     }
 
-    public void setQuantity(int quantity) {
+    private void setQuantity(int quantity) {
         this.quantity = quantity;
     }
 
@@ -62,6 +62,53 @@ public class BasketLineItem {
                 ", product=" + product +
                 ", quantity=" + quantity +
                 '}';
+    }
+
+    public static class Builder {
+        private final Basket basket;
+
+        private Product product;
+        private int quantity;
+        public Builder(Basket basket) {
+            this.basket = basket;
+        }
+
+        public Builder product(Product product) {
+            this.product = product;
+            return this;
+        }
+
+        public Builder quantity(int quantity) {
+            this.quantity = quantity;
+            return this;
+        }
+
+        public BasketLineItem build() {
+            BasketLineItem item = new BasketLineItem();
+            item.setQuantity(this.quantity);
+            item.setProduct(this.product);
+            item.setBasket(this.basket);
+            return item;
+        }
+    }
+
+    public static class Updater {
+        private final BasketLineItem item;
+
+        private int quantity;
+        public Updater(BasketLineItem item) {
+            this.item = item;
+        }
+
+        public Updater quantity (int quantity) {
+            this.quantity = quantity;
+            return this;
+        }
+
+        public BasketLineItem update() {
+            this.item.setQuantity(quantity);
+            return this.item;
+        }
     }
 }
 
