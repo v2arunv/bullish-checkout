@@ -1,6 +1,5 @@
 package com.bullish.checkout.domain;
 
-import com.bullish.checkout.domain.dealapplicator.BasketCheckout;
 import com.bullish.checkout.domain.dealapplicator.DealApplicatorFactory;
 import org.springframework.stereotype.Component;
 

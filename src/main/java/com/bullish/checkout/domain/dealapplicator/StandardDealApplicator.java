@@ -1,6 +1,7 @@
 package com.bullish.checkout.domain.dealapplicator;
 
 import com.bullish.checkout.Constants;
+import com.bullish.checkout.domain.BasketCheckout;
 import com.bullish.checkout.domain.BasketLineItemWithDeal;
 import com.bullish.checkout.domain.Deal;
 import org.javamoney.moneta.Money;

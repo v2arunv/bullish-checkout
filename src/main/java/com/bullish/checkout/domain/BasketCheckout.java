@@ -1,4 +1,4 @@
-package com.bullish.checkout.domain.dealapplicator;
+package com.bullish.checkout.domain;
 
 import com.bullish.checkout.Constants;
 import com.bullish.checkout.domain.BasketLineItemWithDeal;

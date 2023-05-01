@@ -1,5 +1,7 @@
 package com.bullish.checkout.domain.dealapplicator;
 
+import com.bullish.checkout.domain.BasketCheckout;
+
 /*
     There are many ways in which deal(s) can be applied on a given basket.
     For example, if we have multiple regions, we'd probably want to have region-specific deal
