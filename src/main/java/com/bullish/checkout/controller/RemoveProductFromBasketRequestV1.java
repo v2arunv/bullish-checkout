@@ -1,6 +1,6 @@
 package com.bullish.checkout.controller;
 
-public class RemoveProductFromBasketRequestV1 {
+class RemoveProductFromBasketRequestV1 {
 
     private Long basketId;
 

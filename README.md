@@ -1,8 +1,10 @@
-# Checkout System
+# Bullish Checkout
 
 Refer to **Bullish Technical Assessment.pdf** for the original requirements. This is a Spring Boot application that utilises Spring Security and in-memory DB to achieve the provided requirements. 
 
 For your convinience, you can run `setup.sh` which is a helper script that can add products and deals into a running instance of the web application. Please note you will have to run this every time you stop & start the app since none of the data is persisted.
+
+
 
 ## Running the application
 ```
@@ -15,6 +17,13 @@ For your convinience, you can run `setup.sh` which is a helper script that can a
 ```
 
 # Assumptions 
+
+## Design choices
+
+**Request, Responses & DTOs**: In an ideal world, we could use a OpenAPI contract and its codegen tools to create controllers and POJOs that represent the API contract. However, for this challenge, I've decided to just create Request, Response and DTO objects myself with mappers that can convert them to and from the domain object as required
+
+**Deals**: There are several ways to structure discounts/deals (such as a flat discount or a percentage amount for a given product) and there are several ways to apply them. We have to also consider what needs to be done when a product has multiple applicable/eligible deals. There needs to be a mechanism that governs how they are applied at checkout. Refer to `dealapplicator` to understand how this has been structured
+
 
 
 ## Authentication

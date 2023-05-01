@@ -1,6 +1,6 @@
 package com.bullish.checkout.controller;
 
-public class AddProductToBasketRequestV1 {
+class AddProductToBasketRequestV1 {
 
     private Long basketId;
 

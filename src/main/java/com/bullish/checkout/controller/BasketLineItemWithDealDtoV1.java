@@ -2,7 +2,7 @@ package com.bullish.checkout.controller;
 
 import com.bullish.checkout.domain.BasketLineItemWithDeal;
 
-public class BasketLineItemWithDealDtoV1 {
+class BasketLineItemWithDealDtoV1 {
 
     private ProductDtoV1 product;
 
