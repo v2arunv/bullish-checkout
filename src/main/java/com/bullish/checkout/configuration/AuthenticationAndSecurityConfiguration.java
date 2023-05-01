@@ -30,7 +30,7 @@ public class AuthenticationAndSecurityConfiguration {
     private final String[] protectedPaths = Stream.of(Constants.PRODUCT_BASE_PATH, Constants.DEAL_BASE_PATH)
             .map(x -> x+"/**").toArray(String[]::new);
 
-    private final String[] unprotectedPaths = Stream.of(Constants.BASKET_BASE_PATH, Constants.ERROR_PATH, Constants.H2_UI)
+    private final String[] unprotectedPaths = Stream.of(Constants.BASKET_BASE_PATH, Constants.ERROR_PATH)
             .map(x -> x+"/**").toArray(String[]::new);
 
 

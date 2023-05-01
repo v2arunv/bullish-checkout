@@ -49,7 +49,7 @@ public class Deal {
         return type;
     }
 
-    public void setType(DealType type) {
+    private void setType(DealType type) {
         this.type = type;
     }
 
@@ -57,7 +57,7 @@ public class Deal {
         return product;
     }
 
-    public void setProduct(Product product) {
+    private void setProduct(Product product) {
         this.product = product;
     }
 
