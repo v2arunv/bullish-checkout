@@ -1,6 +1,7 @@
 package com.bullish.checkout.domain;
 
-import org.apache.commons.logging.Log;
+import com.bullish.checkout.domain.dealapplicator.BasketCheckout;
+import com.bullish.checkout.domain.dealapplicator.DealApplicatorFactory;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -15,19 +16,26 @@ public class BasketOperations {
     private final BasketRepository basketRepository;
     private final BasketLineItemRepository basketLineItemRepository;
 
+    private final DealApplicatorFactory dealApplicatorFactory;
 
-    public BasketOperations(DealRepository dealRepository, ProductRepository productRepository, BasketRepository basketRepository, BasketLineItemRepository basketLineItemRepository) {
+    public BasketOperations(
+            DealRepository dealRepository,
+            ProductRepository productRepository,
+            BasketRepository basketRepository,
+            BasketLineItemRepository basketLineItemRepository,
+            DealApplicatorFactory dealApplicatorFactory
+    ) {
         this.dealRepository = dealRepository;
         this.productRepository = productRepository;
         this.basketRepository = basketRepository;
         this.basketLineItemRepository = basketLineItemRepository;
+        this.dealApplicatorFactory = dealApplicatorFactory;
     }
 
     public Basket createBasket(){
         Basket basket = new Basket();
 
         basketRepository.save(basket);
-        System.out.println("BASKET = "+basket.getId());
 
         return basket;
     }
@@ -49,5 +57,13 @@ public class BasketOperations {
         Basket basket = basketRepository.findById(Long.valueOf(id)).get();
 
         return basket;
+    }
+
+    public BasketCheckout checkout(String id) {
+        Basket basket = basketRepository.findById(Long.valueOf(id)).get();
+
+        return dealApplicatorFactory
+                .getStandardDeal(basket)
+                .calculate();
     }
 }

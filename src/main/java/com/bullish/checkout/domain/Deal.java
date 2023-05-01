@@ -159,6 +159,9 @@ public class Deal {
             if (this.dealType == DealType.FLAT_AMOUNT) {
                 throw new InvalidDealException("This deal is a flat discount type. A flat discount amount cannot be set");
             }
+            if (percentage.compareTo(BigDecimal.valueOf(100)) > 0) {
+                throw new InvalidDealException("Percentage value cannot be greater than 100");
+            }
             this.discountPercentage = percentage;
             return this;
         }
