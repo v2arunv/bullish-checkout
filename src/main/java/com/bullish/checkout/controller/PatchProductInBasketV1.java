@@ -1,7 +1,6 @@
 package com.bullish.checkout.controller;
 
 class PatchProductInBasketV1 {
-    private Long basketId;
 
     private Long productId;
     private int quantity;
@@ -21,11 +20,4 @@ class PatchProductInBasketV1 {
         this.quantity = quantity;
     }
 
-    public Long getBasketId() {
-        return basketId;
-    }
-
-    public void setBasketId(Long basketId) {
-        this.basketId = basketId;
-    }
 }

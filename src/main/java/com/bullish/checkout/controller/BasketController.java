@@ -30,24 +30,24 @@ public class BasketController {
         return ResponseEntity.ok(BasketResponseV1.from(basketOperations.createBasket()));
     }
 
-    @PostMapping("/product")
-    public ResponseEntity<BasketResponseV1> addProduct(@RequestBody AddProductToBasketRequestV1 request) {
+    @PostMapping("/{id}/product")
+    public ResponseEntity<BasketResponseV1> addProduct(@PathVariable String id, @RequestBody AddProductToBasketRequestV1 request) {
         return ResponseEntity.ok(BasketResponseV1.from(
-                basketOperations.addToBasket(request.getBasketId(), request.getProductId(), request.getQuantity())
+                basketOperations.addToBasket(Long.valueOf(id), request.getProductId(), request.getQuantity())
         ));
     }
 
-    @DeleteMapping("/product")
-    public ResponseEntity<BasketResponseV1> removeProduct(@RequestBody RemoveProductFromBasketRequestV1 request) {
+    @DeleteMapping("/{id}/product")
+    public ResponseEntity<BasketResponseV1> removeProduct(@PathVariable String id, @RequestBody RemoveProductFromBasketRequestV1 request) {
         return ResponseEntity.ok(BasketResponseV1.from(
-            basketOperations.patchProductInBasket(request.getBasketId(), request.getProductId(), 0)
+            basketOperations.patchProductInBasket(Long.valueOf(id), request.getProductId(), 0)
         ));
     }
 
-    @PatchMapping("/product")
-    public ResponseEntity<BasketResponseV1> updateProduct(@RequestBody PatchProductInBasketV1 request) {
+    @PatchMapping("/{id}/product")
+    public ResponseEntity<BasketResponseV1> updateProduct(@PathVariable String id, @RequestBody PatchProductInBasketV1 request) {
         return ResponseEntity.ok(BasketResponseV1.from(
-                basketOperations.patchProductInBasket(request.getBasketId(), request.getProductId(), request.getQuantity())
+                basketOperations.patchProductInBasket(Long.valueOf(id), request.getProductId(), request.getQuantity())
         ));
     }
 

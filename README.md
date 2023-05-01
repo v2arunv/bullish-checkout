@@ -36,6 +36,6 @@ Authorization: Basic YWRtaW46aWFtYWRtaW4=
 
 Please include them in all your requests. Any **unauthenticated** requests will be treated as customer requests
 
-## TBD
+## Postman Collection
 
-<TBD>
+You can import `Bullish Assignment.postman_collection.json` into your local Postman to get a collection of requests that can be used to interact with the system

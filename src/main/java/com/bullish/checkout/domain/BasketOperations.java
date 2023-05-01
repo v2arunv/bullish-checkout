@@ -1,9 +1,6 @@
 package com.bullish.checkout.domain;
 
-import com.bullish.checkout.BasketNotFoundException;
-import com.bullish.checkout.BusinessException;
-import com.bullish.checkout.ProductNotFoundException;
-import com.bullish.checkout.ProductNotInBasketException;
+import com.bullish.checkout.*;
 import com.bullish.checkout.domain.dealapplicator.StandardDealApplicatorFactory;
 import org.springframework.stereotype.Component;
 
@@ -41,6 +38,10 @@ public class BasketOperations {
     }
 
     public Basket addToBasket(Long basketId, Long productId, int quantity) {
+        if (quantity == 0) {
+            throw new InvalidQuantityArgumentException("Product quantity cannot be zero");
+        }
+
         Basket basket = basketRepository.findById(basketId)
                 .orElseThrow((Supplier<BusinessException>) () -> new BasketNotFoundException(basketId));
 
