@@ -1,7 +1,6 @@
 package com.bullish.checkout.domain;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.CompositeType;
 
 import java.util.Set;
 
@@ -15,6 +14,10 @@ public class Basket {
 
     @OneToMany(mappedBy = "basket")
     private Set<BasketLineItem> basketLineItems;
+
+    public Basket() {
+        this.basketLineItems = Set.of();
+    }
 
     public Long getId() {
         return id;

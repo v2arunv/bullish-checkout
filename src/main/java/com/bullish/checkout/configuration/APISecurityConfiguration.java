@@ -18,7 +18,7 @@ import java.util.stream.Stream;
 
 @Configuration
 @EnableWebSecurity
-public class AuthenticationAndSecurityConfiguration {
+public class APISecurityConfiguration {
 
     @Value( "${api.username}" )
     private String username;

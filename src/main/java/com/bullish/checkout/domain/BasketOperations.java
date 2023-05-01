@@ -1,8 +1,11 @@
 package com.bullish.checkout.domain;
 
-import com.bullish.checkout.domain.dealapplicator.DealApplicatorFactory;
+import com.bullish.checkout.BusinessException;
+import com.bullish.checkout.ProductNotFoundException;
 import com.bullish.checkout.domain.dealapplicator.StandardDealApplicatorFactory;
 import org.springframework.stereotype.Component;
+
+import java.util.function.Supplier;
 
 @Component
 public class BasketOperations {
@@ -40,30 +43,53 @@ public class BasketOperations {
         return basket;
     }
 
-    public BasketLineItem addToBasket() {
-        Basket basket = basketRepository.findById(1L).get();
+    public Basket addToBasket(Long basketId, Long productId, int quantity) {
+        Basket basket = basketRepository.findById(basketId).get();
 
-        Product product = productRepository.findById(3L).get();
+        Product product = productRepository.findById(productId).get();
 
         BasketLineItem basketLineItem = new BasketLineItem();
         basketLineItem.setBasket(basket);
         basketLineItem.setProduct(product);
-        basketLineItem.setQuantity(5);
+        basketLineItem.setQuantity(quantity);
 
-        return basketLineItemRepository.save(basketLineItem);
+        basketLineItemRepository.save(basketLineItem);
+        return basket;
     }
 
-    public Basket getBasket(String id) {
-        Basket basket = basketRepository.findById(Long.valueOf(id)).get();
+    public Basket getBasket(Long id) {
+        Basket basket = basketRepository.findById(id).get();
 
         return basket;
     }
 
-    public BasketCheckout checkout(String id) {
-        Basket basket = basketRepository.findById(Long.valueOf(id)).get();
+    public BasketCheckout checkout(Long id) {
+        Basket basket = basketRepository.findById(id).get();
 
         return dealApplicatorFactory
                 .createStandardDealApplicator(basket)
                 .calculate();
+    }
+
+    public void deleteBasket(Long id) {
+        basketRepository.deleteById(id);
+    }
+
+    public Basket patchProductInBasket(Long basketId, Long productId, int quantity) {
+        Basket basket = basketRepository.findById(basketId).get();
+
+        BasketLineItem item =  basket.getBasketLineItems()
+                .stream()
+                .filter(x -> x.getProduct().getId().equals(productId))
+                .findFirst()
+                .orElseThrow((Supplier<BusinessException>) () -> new ProductNotFoundException(productId));
+
+        if (quantity == 0) {
+            basketLineItemRepository.delete(item);
+        } else {
+            item.setQuantity(quantity);
+            basketLineItemRepository.save(item);
+        }
+        return basket;
     }
 }

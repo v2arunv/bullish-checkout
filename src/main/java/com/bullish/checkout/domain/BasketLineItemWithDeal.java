@@ -19,6 +19,7 @@ public class BasketLineItemWithDeal {
         this.basketLineItem = basketLineItem;
         this.eligibleDeals = deals;
         this.originalPrice = calculateOriginalPrice();
+        this.discountedPrice = Money.of(0, Constants.DEFAULT_CURRENCY);
     }
 
     public BasketLineItem getBasketLineItem() {

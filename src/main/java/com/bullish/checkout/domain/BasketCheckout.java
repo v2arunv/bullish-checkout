@@ -8,6 +8,7 @@ import java.util.List;
 
 public class BasketCheckout {
 
+    private Long id;
     private final List<BasketLineItemWithDeal> lineItemWithDeals;
 
     private Money totalAmount;
@@ -15,7 +16,8 @@ public class BasketCheckout {
     private Money netAmount;
 
 
-    public BasketCheckout(List<BasketLineItemWithDeal> lineItemWithDeals) {
+    public BasketCheckout(Long id, List<BasketLineItemWithDeal> lineItemWithDeals) {
+        this.id = id;
         this.lineItemWithDeals = lineItemWithDeals;
         this.totalAmount = calculateTotalAmount();
     }
@@ -34,6 +36,10 @@ public class BasketCheckout {
 
     public void setNetAmount(Money netAmount) {
         this.netAmount = netAmount;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public Money calculateTotalAmount() {

@@ -19,7 +19,7 @@ public class StandardDealApplicatorFactory extends DealApplicatorFactory {
                 .map(this::createLineItemWithDeal)
                 .toList();
 
-        BasketCheckout checkout = new BasketCheckout(lineItems);
+        BasketCheckout checkout = new BasketCheckout(basket.getId(), lineItems);
         return new StandardDealApplicator(checkout);
     }
 }

@@ -3,7 +3,7 @@ package com.bullish.checkout.controller;
 
 import com.bullish.checkout.Constants;
 import com.bullish.checkout.domain.BasketOperations;
-import com.bullish.checkout.domain.ProductOperations;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 /*
@@ -20,34 +20,46 @@ public class BasketController {
     }
 
     @GetMapping("/{id}")
-    public String getBasket(@PathVariable String id) {
-        return basketOperations.getBasket(id).toString();
-    }
-
-    @PostMapping("/{id}/checkout")
-    public String performCheckout(@PathVariable String id) {
-        return basketOperations.checkout(id).toString();
+    public ResponseEntity<BasketResponseV1> getBasket(@PathVariable String id) {
+        return ResponseEntity.ok(BasketResponseV1.from(basketOperations.getBasket(Long.valueOf(id))));
     }
 
     @PostMapping
-    public String createBasket() {
-        return basketOperations.createBasket().toString();
+    @ResponseBody
+    public ResponseEntity<BasketResponseV1> createBasket() {
+        return ResponseEntity.ok(BasketResponseV1.from(basketOperations.createBasket()));
     }
 
     @PostMapping("/product")
-    public String addProduct() {
-        return basketOperations.addToBasket().toString();
+    public ResponseEntity<BasketResponseV1> addProduct(@RequestBody AddProductToBasketRequestV1 request) {
+        return ResponseEntity.ok(BasketResponseV1.from(
+                basketOperations.addToBasket(request.getBasketId(), request.getProductId(), request.getQuantity())
+        ));
     }
 
     @DeleteMapping("/product")
-    public String removeProduct() {
-        return "removeProduct";
+    public ResponseEntity<BasketResponseV1> removeProduct(@RequestBody RemoveProductFromBasketRequestV1 request) {
+        return ResponseEntity.ok(BasketResponseV1.from(
+            basketOperations.patchProductInBasket(request.getBasketId(), request.getProductId(), 0)
+        ));
     }
 
-    @DeleteMapping("/")
-    public String deleteBasket() {
-        return "deleteBasket";
+    @PatchMapping("/product")
+    public ResponseEntity<BasketResponseV1> updateProduct(@RequestBody PatchProductInBasketV1 request) {
+        return ResponseEntity.ok(BasketResponseV1.from(
+                basketOperations.patchProductInBasket(request.getBasketId(), request.getProductId(), request.getQuantity())
+        ));
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteBasket(@PathVariable String id) {
+        basketOperations.deleteBasket(Long.valueOf(id));
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{id}/checkout")
+    public ResponseEntity<CheckoutResponseV1> performCheckout(@PathVariable String id) {
+        return ResponseEntity.ok(CheckoutResponseV1.from(basketOperations.checkout(Long.valueOf(id))));
+    }
 
 }
