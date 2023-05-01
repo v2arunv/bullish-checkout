@@ -22,9 +22,4 @@ public class StandardDealApplicatorFactory extends DealApplicatorFactory {
         BasketCheckout checkout = new BasketCheckout(lineItems);
         return new StandardDealApplicator(checkout);
     }
-
-    private BasketLineItemWithDeal createLineItemWithDeal(BasketLineItem basketLineItem) {
-        List<Deal> eligibleDeals = dealRepository.findAllByProduct(basketLineItem.getProduct());
-        return new BasketLineItemWithDeal(basketLineItem, eligibleDeals);
-    }
 }
