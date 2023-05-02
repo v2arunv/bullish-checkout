@@ -2,9 +2,10 @@
 
 Refer to **Bullish Technical Assessment.pdf** for the original requirements. This is a Spring Boot application that utilises Spring Security and in-memory DB to achieve the provided requirements. 
 
-For your convinience, you can run `setup.sh` which is a helper script that can add products and deals into a running instance of the web application. Please note you will have to run this every time you stop & start the app since none of the data is persisted.
+For your convenience, you can run `run.sh` which is a helper script that can add products and deals into a running instance of the web application. 
+Please note you will have to run this every time you stop & start the app since none of the data is persisted.
 
-
+You can find the pre-loaded products and deals my look at `src/main/resources/data.sql`. You can use them for your testing. You can also just use the Postman collection directly.
 
 ## Running the application
 
@@ -42,3 +43,14 @@ Please include them in all your requests. Any **unauthenticated** requests will 
 ## Postman Collection
 
 You can import `Bullish Assignment.postman_collection.json` into your local Postman to get a collection of requests that can be used to interact with the system
+
+
+## Areas for improvment
+
+1) When I started the xxxOperations where pretty lightweight and I liked how clear it was of additional logic, but as time went on, it's become a little too meaty.
+2) I have to rely on DirtyContext since the data needs to be reset and I need JPA/Hibernate to flush/reset everytime. If we're expanding this further, I think I need to break it down more to allow for fewer resets
+3) The tests are huge and yes, there are pieces that are duplicated, but as mentioned in the requirements as well, I wanted the tests to be self-descriptive without having to surf through a lot of files to understand what the request/response is
+4) I prefer Integration Tests over unit tests because it allows you to test the state of the entire application and provide the exact input a user of the service would provide and validate against the output they would receive. That being said, there is value in Unit Testing and if I had a little more time and room, I would've invested in that as well
+5) The entities are immutable outside its own class and only updated/constructed through builder patterns - but I wonder if there's a better way to keep the internal data/state abstracted hidden away.
+6) The DB setups for the integration tests are becoming cumbersome, but in order for the tests to be precise, I needed them to be deterministic and hence had to create a DB that represents a point-in-time. If the application gets bigger, it will become unwieldy as well.
+7) The Spring JPA/DDL Initialisation does a little too much magic for my taste, I'd prefer the good-old flyway scripts and will choose that should we need to productionise something
