@@ -9,7 +9,9 @@ You can find the pre-loaded products and deals by looking at `src/main/resources
 
 ## Running the application
 
-This project uses docker and docker-compose, so please have that installed prior to running the command. The shell script, uses the attached `gradlew` executable to create a docker image and then uses docker-compose to attach the container's port to your `localhost` 's 8080
+The Java version used is Java 17 and the gradle version used 7.6.1 (the bundled bin is that version)
+
+This project uses docker and [docker-compose](https://docs.docker.com/compose/install/), so please have that installed prior to running the command. The shell script, uses the attached `gradlew` executable to create a docker image and then uses docker-compose to attach the container's port to your `localhost` 's 8080
 
 ```
 ./run.sh
