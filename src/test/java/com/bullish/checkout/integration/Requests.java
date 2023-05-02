@@ -5,6 +5,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
+
 public class Requests {
     public static class AddProductToBasketRequest {
         public int productId;
@@ -29,13 +31,13 @@ public class Requests {
             Long productId = this.isInvalid ? 1000L : ProductStub.getById(this.productId).id;
 
             return MockMvcRequestBuilders
-                    .post("/basket/1/product".formatted(this.basketId))
+                    .post("/basket/1/product" .formatted(this.basketId))
                     .content("""
-                        {
-                            "productId": %s,
-                            "quantity": %s
-                        }
-                        """.formatted(productId, quantity))
+                            {
+                                "productId": %s,
+                                "quantity": %s
+                            }
+                            """.formatted(productId, quantity))
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON);
         }
@@ -54,13 +56,13 @@ public class Requests {
 
         public MockHttpServletRequestBuilder build() {
             return MockMvcRequestBuilders
-                    .patch("/basket/%s/product".formatted(this.basketId))
+                    .patch("/basket/%s/product" .formatted(this.basketId))
                     .content("""
-                        {
-                            "productId": %s,
-                            "quantity": %s
-                        }
-                        """.formatted(ProductStub.getById(this.productId).id, quantity))
+                            {
+                                "productId": %s,
+                                "quantity": %s
+                            }
+                            """.formatted(ProductStub.getById(this.productId).id, quantity))
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON);
         }
@@ -77,12 +79,12 @@ public class Requests {
 
         public MockHttpServletRequestBuilder build() {
             return MockMvcRequestBuilders
-                    .delete("/basket/%s/product".formatted(this.basketId))
+                    .delete("/basket/%s/product" .formatted(this.basketId))
                     .content("""
-                        {
-                            "productId": %s
-                        }
-                        """.formatted(ProductStub.getById(this.productId).id))
+                            {
+                                "productId": %s
+                            }
+                            """.formatted(ProductStub.getById(this.productId).id))
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON);
         }
@@ -97,7 +99,120 @@ public class Requests {
 
         public MockHttpServletRequestBuilder build() {
             return MockMvcRequestBuilders
-                    .post("/basket/%s/checkout".formatted(this.basketId))
+                    .post("/basket/%s/checkout" .formatted(this.basketId))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON);
+        }
+    }
+
+    public static class AddFlatDiscountDealRequest {
+        public int productId;
+        public int minimumQuantity = 1;
+        public int maximumQuantity = 10;
+
+        public int discount;
+        private String username;
+        private String password;
+
+        public AddFlatDiscountDealRequest(
+                int productId,
+                int discount,
+                String username,
+                String password
+        ) {
+            this.productId = productId;
+            this.discount = discount;
+            this.username = username;
+            this.password = password;
+        }
+        public MockHttpServletRequestBuilder build() {
+            return MockMvcRequestBuilders
+                    .post("/deal")
+                    .content("""
+                            {
+                                "productId": %s,
+                                "dealType": "FLAT_AMOUNT",
+                                "flatDiscount": %s,
+                                "minimumQuantity": %s,
+                                "maximumQuantity": %s
+                                
+                            }
+                            """.formatted(
+                            ProductStub.getById(this.productId).id,
+                            this.discount,
+                            this.minimumQuantity,
+                            this.maximumQuantity
+                    ))
+                    .with(httpBasic(username, password))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON);
+        }
+    }
+
+    public static class AddPercentageDiscountDealRequest {
+        public int productId;
+        public int minimumQuantity = 1;
+        public int maximumQuantity = 10;
+        public int percentage;
+
+        private String username;
+        private String password;
+
+        public AddPercentageDiscountDealRequest(
+                int productId,
+                int percentage,
+                String username,
+                String password
+        ) {
+            this.productId = productId;
+            this.percentage = percentage;
+            this.username = username;
+            this.password = password;
+        }
+
+        public MockHttpServletRequestBuilder build() {
+            return MockMvcRequestBuilders
+                    .post("/deal")
+                    .content("""
+                            {
+                                "productId": %s,
+                                "dealType": "PERCENTAGE",
+                                "discountPercentage": %s,
+                                "minimumQuantity": %s,
+                                "maximumQuantity": %s
+                                
+                            }
+                            """.formatted(
+                            ProductStub.getById(this.productId).id,
+                            this.percentage,
+                            this.minimumQuantity,
+                            this.maximumQuantity
+                    ))
+                    .with(httpBasic(username, password))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON);
+        }
+    }
+
+    public static class DeleteDealRequest {
+        public int dealId;
+        String username;
+        String password;
+
+        public DeleteDealRequest(
+                int productId,
+                String username,
+                String password
+        ) {
+            this.dealId = productId;
+            this.username = username;
+            this.password = password;
+        }
+
+        public MockHttpServletRequestBuilder build() {
+            return MockMvcRequestBuilders
+                    .delete("/deal/%s" .formatted(this.dealId))
+                    .with(httpBasic(username, password))
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON);
         }

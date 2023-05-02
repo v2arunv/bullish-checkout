@@ -94,4 +94,16 @@ public class Product {
         }
 
     }
+
+//    public static class Updater {
+//
+//        private Product product;
+//        public Updater(Product product) {
+//            this.product = product;
+//        }
+//
+//        public Updater removeDeal(Deal deal) {
+//            product.
+//        }
+//    }
 }

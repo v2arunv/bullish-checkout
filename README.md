@@ -7,6 +7,9 @@ For your convinience, you can run `setup.sh` which is a helper script that can a
 
 
 ## Running the application
+
+This project uses docker and docker-compose, so please have that installed prior to running the command. The shell script, creates a docker image and then uses docker-compose to attach the container's port to your `localhost` 's 8080
+
 ```
 ./run.sh
 ```

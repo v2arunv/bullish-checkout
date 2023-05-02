@@ -29,6 +29,9 @@ class MoneyDtoV1 {
     }
 
     public static MoneyDtoV1 from(Money money) {
+        if (money == null) {
+            return null;
+        }
         return new MoneyDtoV1(money);
     }
 }
