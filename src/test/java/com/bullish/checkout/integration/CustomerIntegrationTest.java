@@ -1,6 +1,9 @@
 package com.bullish.checkout.integration;
 
 import com.bullish.checkout.integration.stubs.ProductStub;
+import com.bullish.checkout.integration.Requests.AddProductToBasketRequest;
+import com.bullish.checkout.integration.Requests.PatchProductInBasketRequest;
+import com.bullish.checkout.integration.Requests.DeleteProductInBasketRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -13,6 +16,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
 
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -51,7 +55,7 @@ public class CustomerIntegrationTest {
 
 
     @Nested
-    public class PostBucketCreationTests {
+    public class AddToBucketTests {
         @BeforeEach
         public void createBasket() throws Exception {
             mockMvc.perform(MockMvcRequestBuilders.post("/basket"));;
@@ -149,6 +153,16 @@ public class CustomerIntegrationTest {
                     .andExpect(status().reason(containsString("Product quantity cannot be zero")));
         }
 
+
+
+    }
+
+    @Nested
+    public class PatchProductsInBasketTests {
+        @BeforeEach
+        public void createBasket() throws Exception {
+            mockMvc.perform(MockMvcRequestBuilders.post("/basket"));
+        }
         @Test
         public void testAddProductsAndReduceQuantity() throws Exception {
             var addRequest = new AddProductToBasketRequest(2, 5);
@@ -165,67 +179,86 @@ public class CustomerIntegrationTest {
                     .andExpect(jsonPath("$.items[0].quantity").value(patchRequest.quantity));
         }
 
-    }
+        @Test
+        public void testPatchProductInBasketWithNoProducts() throws Exception {
+            var patchRequest = new PatchProductInBasketRequest(2, 3);
 
-    private class AddProductToBasketRequest {
-        public int productId;
-        public int quantity;
-        public int basketId;
-
-        private boolean isInvalid;
-
-        public AddProductToBasketRequest(int productId, int quantity) {
-            this.productId = productId;
-            this.quantity = quantity;
-            this.basketId = 1;
-            this.isInvalid = false;
+            mockMvc.perform(patchRequest.build())
+                    .andExpect(status().isBadRequest())
+                    .andExpect(status().reason(containsString("does not exist in this basket")));
         }
 
-        public AddProductToBasketRequest(int quantity) {
-            this.isInvalid = true;
-            this.quantity = quantity;
-        }
+        @Test
+        public void testPatchProductToAQuantityOfZero() throws Exception {
+            var addRequest = new AddProductToBasketRequest(2, 5);
+            var patchRequest = new PatchProductInBasketRequest(2, 0);
 
-        public MockHttpServletRequestBuilder build() {
-            Long productId = this.isInvalid ? 1000L : ProductStub.getById(this.productId).id;
+            mockMvc.perform(addRequest.build());
 
-            return MockMvcRequestBuilders
-                    .post("/basket/1/product".formatted(this.basketId))
-                    .content("""
-                        {
-                            "productId": %s,
-                            "quantity": %s
-                        }
-                        """.formatted(productId, quantity))
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .accept(MediaType.APPLICATION_JSON);
+            mockMvc.perform(patchRequest.build());
+
+            mockMvc.perform(MockMvcRequestBuilders.get("/basket/1"))
+                    .andExpect(jsonPath("$.id").value("1"))
+                    .andExpect(jsonPath("$.items").isEmpty());
+
         }
     }
 
-    private class PatchProductInBasketRequest {
-        public int productId;
-        public int quantity;
-        public int basketId;
-
-        public PatchProductInBasketRequest(int productId, int quantity) {
-            this.productId = productId;
-            this.quantity = quantity;
-            this.basketId = 1;
+    @Nested
+    public class DeleteProductsInBasketTests {
+        @BeforeEach
+        public void createBasket() throws Exception {
+            mockMvc.perform(MockMvcRequestBuilders.post("/basket"));
         }
 
-        public MockHttpServletRequestBuilder build() {
-            return MockMvcRequestBuilders
-                    .patch("/basket/%s/product".formatted(this.basketId))
-                    .content("""
-                        {
-                            "productId": %s,
-                            "quantity": %s
-                        }
-                        """.formatted(ProductStub.getById(this.productId).id, quantity))
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .accept(MediaType.APPLICATION_JSON);
+        @Test
+        public void testAddProductsAndDelete() throws Exception {
+            var addRequest = new AddProductToBasketRequest(2, 5);
+            var deleteRequest = new DeleteProductInBasketRequest(addRequest.productId);
+
+            mockMvc.perform(addRequest.build());
+            mockMvc.perform(deleteRequest.build());
+
+            mockMvc.perform(MockMvcRequestBuilders.get("/basket/1"))
+                    .andExpect(jsonPath("$.id").value("1"))
+                    .andExpect(jsonPath("$.items").isEmpty());
         }
+
+        @Test
+        public void testAddMultipleProductsAndDeleteOne() throws Exception {
+            var addRequestOne = new AddProductToBasketRequest(1, 10);
+            var addRequestTwo = new AddProductToBasketRequest(2, 5);
+            var deleteRequest = new DeleteProductInBasketRequest(addRequestOne.productId);
+
+            mockMvc.perform(addRequestOne.build());
+            mockMvc.perform(addRequestTwo.build());
+            mockMvc.perform(deleteRequest.build());
+
+            mockMvc.perform(MockMvcRequestBuilders.get("/basket/1"))
+                    .andExpect(jsonPath("$.id").value("1"))
+                    .andExpect(jsonPath("$.items", hasSize(1)))
+                    .andExpect(jsonPath("$.items[0].product.id").value(ProductStub.getById(addRequestTwo.productId).id))
+                    .andExpect(jsonPath("$.items[0].product.price").isNotEmpty())
+                    .andExpect(jsonPath("$.items[0].product.price.amount").value(ProductStub.getById(addRequestTwo.productId).price))
+                    .andExpect(jsonPath("$.items[0].quantity").value(addRequestTwo.quantity));
+        }
+
+        @Test
+        public void testDeleteOnProductThatDoesNotExistInBucket() throws Exception {
+            var deleteRequest = new DeleteProductInBasketRequest(1);
+
+            mockMvc.perform(deleteRequest.build())
+                    .andExpect(status().isBadRequest())
+                    .andExpect(status().reason(containsString("does not exist in this basket")));
+
+        }
+
+
     }
+
+
+
+
 
 
 }

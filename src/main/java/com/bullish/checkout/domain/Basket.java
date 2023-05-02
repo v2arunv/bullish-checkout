@@ -11,8 +11,8 @@ public class Basket {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-
-    @OneToMany(mappedBy = "basket")
+    @OneToMany(mappedBy = "basket", targetEntity = BasketLineItem.class, cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<BasketLineItem> basketLineItems;
 
     private Basket() {

@@ -3,6 +3,7 @@ package com.bullish.checkout.domain;
 import com.bullish.checkout.*;
 import com.bullish.checkout.domain.dealapplicator.StandardDealApplicatorFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.function.Supplier;
 
@@ -82,8 +83,10 @@ public class BasketOperations {
 
     }
 
+    @Transactional
     public Basket patchProductInBasket(Long basketId, Long productId, int quantity) {
-        Basket basket = basketRepository.findById(basketId).get();
+        Basket basket = basketRepository.findById(basketId)
+                .orElseThrow((Supplier<BusinessException>) () -> new BasketNotFoundException(basketId));
 
         BasketLineItem item = basket.getBasketLineItems()
                 .stream()
@@ -93,6 +96,7 @@ public class BasketOperations {
 
         if (quantity == 0) {
             basketLineItemRepository.delete(item);
+            basket.getBasketLineItems().remove(item);
         } else {
             BasketLineItem updatedItem = new BasketLineItem.Updater(item)
                     .quantity(quantity)
