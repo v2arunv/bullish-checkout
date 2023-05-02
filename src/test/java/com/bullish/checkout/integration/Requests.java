@@ -242,7 +242,7 @@ public class Requests {
                     .content("""
                             {
                                 "price": %s,
-                                "name": "%s"                                
+                                "name": "%s"                            
                             }
                             """.formatted(
                             this.price,

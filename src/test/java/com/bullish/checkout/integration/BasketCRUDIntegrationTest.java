@@ -129,7 +129,7 @@ public class BasketCRUDIntegrationTest {
                     .andExpect(jsonPath("$.items", hasSize(1)))
                     .andExpect(jsonPath("$.items[0].product.id").value(ProductStub.getById(first.productId).id))
                     .andExpect(jsonPath("$.items[0].product.price").isNotEmpty())
-                    .andExpect(jsonPath("$.items[0].product.price.amount").value(ProductStub.getById(first.productId).id))
+                    .andExpect(jsonPath("$.items[0].product.price.amount").value(ProductStub.getById(first.productId).price))
                     .andExpect(jsonPath("$.items[0].quantity").value(first.quantity + second.quantity));
         }
 
@@ -150,8 +150,6 @@ public class BasketCRUDIntegrationTest {
                     .andExpect(status().isBadRequest())
                     .andExpect(status().reason(containsString("Product quantity cannot be zero")));
         }
-
-
 
     }
 

@@ -5,6 +5,7 @@ import com.bullish.checkout.domain.dealapplicator.StandardDealApplicatorFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 @Component
@@ -38,7 +39,7 @@ public class BasketOperations {
         return basket;
     }
 
-    public Basket addToBasket(Long basketId, Long productId, int quantity) {
+    public Basket saviorAddToBasket(Long basketId, Long productId, int quantity) {
         if (quantity == 0) {
             throw new InvalidQuantityArgumentException("Product quantity cannot be zero");
         }
@@ -56,6 +57,44 @@ public class BasketOperations {
 
         basketLineItemRepository.save(basketLineItem);
         return basket;
+    }
+
+    public Basket addToBasket(Long basketId, Long productId, int quantity) {
+        if (quantity == 0) {
+            throw new InvalidQuantityArgumentException("Product quantity cannot be zero");
+        }
+
+        Basket basket = basketRepository.findById(basketId)
+                .orElseThrow((Supplier<BusinessException>) () -> new BasketNotFoundException(basketId));
+
+        Product product = productRepository.findById(productId)
+                .orElseThrow((Supplier<BusinessException>) () -> new ProductNotFoundException(productId));
+
+        Optional<BasketLineItem> existingLineItem = basket.getBasketLineItems()
+                .stream()
+                .filter(x -> x.getProduct().equals(product))
+                .findFirst();
+
+        BasketLineItem basketLineItem;
+
+        if (existingLineItem.isPresent()) {
+            basketLineItem = new BasketLineItem.Updater(existingLineItem.get())
+                    .quantity(quantity + existingLineItem.get().getQuantity())
+                    .update();
+        } else {
+            basketLineItem = new BasketLineItem.Builder(basket)
+                    .product(product)
+                    .quantity(quantity)
+                    .build();
+        }
+
+        Basket updatedBasket = new Basket.Updater(basket)
+                .item(basketLineItem)
+                .update();
+
+//        basket.save(basket);
+        basketLineItemRepository.save(basketLineItem);
+        return updatedBasket;
     }
 
     public Basket getBasket(Long id) {

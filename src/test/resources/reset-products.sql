@@ -1,6 +1,6 @@
-// There are better ways to handle this and given more time, we need to find a way to
-// gracefully remove products even if there's a reference to it in other tables
-// However, that's another rabbit hole to jump into and I think I'll save that for later
+--  There are better ways to handle this and given more time, we need to find a way to
+--  gracefully remove products even if there's a reference to it in other tables
+--  However, that's another rabbit hole to jump into and I think I'll save that for later
 
 DELETE FROM deal;
 DELETE FROM product;
