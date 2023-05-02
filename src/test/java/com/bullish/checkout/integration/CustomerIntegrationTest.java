@@ -1,6 +1,6 @@
 package com.bullish.checkout.integration;
 
-import com.bullish.checkout.integration.stubs.ProductStubs;
+import com.bullish.checkout.integration.stubs.ProductStub;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -65,22 +65,17 @@ public class CustomerIntegrationTest {
                     .andExpect(jsonPath("$.id").value("1"))
                     .andExpect(jsonPath("$.items", hasSize(1)))
                     .andExpect(jsonPath("$.items").isNotEmpty())
-                    .andExpect(jsonPath("$.items[0].product.id").value(ProductStubs.getId(request.productId)))
+                    .andExpect(jsonPath("$.items[0].product.id").value(ProductStub.getById(request.productId).id))
                     .andExpect(jsonPath("$.items[0].product.price").isNotEmpty())
-                    .andExpect(jsonPath("$.items[0].product.price.amount").value(ProductStubs.getPrice(request.productId)))
+                    .andExpect(jsonPath("$.items[0].product.price.amount").value(ProductStub.getById(request.productId).price))
                     .andExpect(jsonPath("$.items[0].quantity").value(request.quantity));
         }
 
         @Test
         public void testAddTwoProducts() throws Exception {
-            int productOneStubIndex = 0;
-            int productTwoStubIndex = 1;
 
-            int productOneId = ProductStubs.getId(0).intValue();
-            int productTwoId = ProductStubs.getId(1).intValue();
-
-            var request1 = new AddProductToBasketRequest(productOneId, 1);
-            var request2 = new AddProductToBasketRequest(productTwoId, 3);
+            var request1 = new AddProductToBasketRequest(1, 1);
+            var request2 = new AddProductToBasketRequest(2, 3);
 
 
             mockMvc.perform(request1.build());
@@ -97,20 +92,20 @@ public class CustomerIntegrationTest {
                     // specifics
                     .andExpect(jsonPath("$.items[*].product.id").value(
                             containsInAnyOrder(
-                                    productOneId,
-                                    productTwoId
+                                    request1.productId,
+                                    request2.productId
                             )
                     ))
                     .andExpect(jsonPath("$.items[*].product.price.amount").value(
                             containsInAnyOrder(
-                                    String.valueOf(ProductStubs.getPrice(0)),
-                                    String.valueOf(ProductStubs.getPrice(1))
+                                    String.valueOf(ProductStub.getById(request1.productId).price),
+                                    String.valueOf(ProductStub.getById(request2.productId).price)
                             )
                     ))
                     .andExpect(jsonPath("$.items[*].product.name").value(
                             containsInAnyOrder(
-                                    ProductStubs.getName(0),
-                                    ProductStubs.getName(1)
+                                    ProductStub.getById(request1.productId).name,
+                                    ProductStub.getById(request2.productId).name
                             )
                     ))
                     .andExpect(jsonPath("$.items[*].quantity").value(
@@ -121,8 +116,8 @@ public class CustomerIntegrationTest {
 
         @Test
         public void testAddSameProductInTwoRequestsAndExpectOnlyOneLineItemInBasket() throws Exception {
-            var first = new AddProductToBasketRequest(0, 5);
-            var second = new AddProductToBasketRequest(0, 10);
+            var first = new AddProductToBasketRequest(1, 5);
+            var second = new AddProductToBasketRequest(1, 10);
 
             mockMvc.perform(first.build());
 
@@ -130,9 +125,9 @@ public class CustomerIntegrationTest {
                     .andExpect(jsonPath("$.id").value("1"))
                     .andExpect(jsonPath("$.items").isNotEmpty())
                     .andExpect(jsonPath("$.items", hasSize(1)))
-                    .andExpect(jsonPath("$.items[0].product.id").value(ProductStubs.getId(first.productId)))
+                    .andExpect(jsonPath("$.items[0].product.id").value(ProductStub.getById(first.productId).id))
                     .andExpect(jsonPath("$.items[0].product.price").isNotEmpty())
-                    .andExpect(jsonPath("$.items[0].product.price.amount").value(ProductStubs.getPrice(first.productId)))
+                    .andExpect(jsonPath("$.items[0].product.price.amount").value(ProductStub.getById(first.productId).id))
                     .andExpect(jsonPath("$.items[0].quantity").value(first.quantity + second.quantity));
         }
 
@@ -164,9 +159,9 @@ public class CustomerIntegrationTest {
             mockMvc.perform(patchRequest.build())
                     .andExpect(jsonPath("$.id").value("1"))
                     .andExpect(jsonPath("$.items").isNotEmpty())
-                    .andExpect(jsonPath("$.items[0].product.id").value(ProductStubs.getId(patchRequest.productId)))
+                    .andExpect(jsonPath("$.items[0].product.id").value(ProductStub.getById(patchRequest.productId).id))
                     .andExpect(jsonPath("$.items[0].product.price").isNotEmpty())
-                    .andExpect(jsonPath("$.items[0].product.price.amount").value(ProductStubs.getPrice(patchRequest.productId)))
+                    .andExpect(jsonPath("$.items[0].product.price.amount").value(ProductStub.getById(patchRequest.productId).price))
                     .andExpect(jsonPath("$.items[0].quantity").value(patchRequest.quantity));
         }
 
@@ -192,7 +187,7 @@ public class CustomerIntegrationTest {
         }
 
         public MockHttpServletRequestBuilder build() {
-            Long productId = this.isInvalid ? 1000L : ProductStubs.getId(this.productId);
+            Long productId = this.isInvalid ? 1000L : ProductStub.getById(this.productId).id;
 
             return MockMvcRequestBuilders
                     .post("/basket/1/product".formatted(this.basketId))
@@ -226,7 +221,7 @@ public class CustomerIntegrationTest {
                             "productId": %s,
                             "quantity": %s
                         }
-                        """.formatted(ProductStubs.getId(this.productId), quantity))
+                        """.formatted(ProductStub.getById(this.productId).id, quantity))
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON);
         }
