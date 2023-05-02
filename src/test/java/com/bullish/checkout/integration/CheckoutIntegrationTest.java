@@ -14,6 +14,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import com.bullish.checkout.integration.Requests.CheckoutInBasketRequest;
 import com.bullish.checkout.integration.Requests.AddProductToBasketRequest;
 
+import java.math.BigDecimal;
+
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -23,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-@Sql({"/test-schema.sql","/custom-data.sql"})
+@Sql({"/test-schema.sql", "/products.sql"})
 public class CheckoutIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
@@ -48,7 +50,7 @@ public class CheckoutIntegrationTest {
         }
 
         @Test
-        public void testWhenOneProductIsAdded() throws Exception{
+        public void testWhenOneProductIsAdded() throws Exception {
             var checkoutRequest = new CheckoutInBasketRequest();
             var addProductRequest = new AddProductToBasketRequest(1, 5);
 
@@ -116,20 +118,92 @@ public class CheckoutIntegrationTest {
     }
 
     @Nested
+    @Sql({"/single-percentage-deals-per-product.sql"})
     public class CheckoutWithPercentageDiscountDeals {
         @BeforeEach
         public void createBasket() throws Exception {
             mockMvc.perform(MockMvcRequestBuilders.post("/basket"));
         }
+
         @Test
-        public void testWhenOneProductHasOneEligibleDeal() {
+        public void testWhenOneProductHasOneEligibleDeal() throws Exception {
+            var checkoutRequest = new CheckoutInBasketRequest();
+            var addProductRequest = new AddProductToBasketRequest(1, 5);
+
+            BigDecimal expectedTotalAmount = BigDecimal.valueOf(addProductRequest.quantity)
+                    .multiply(BigDecimal.valueOf(ProductStub.getById(addProductRequest.productId).price));
+
+            BigDecimal expectedNetAmount = expectedTotalAmount.divide(BigDecimal.valueOf(2));
+
+            mockMvc.perform(addProductRequest.build());
+
+            mockMvc.perform(checkoutRequest.build())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.id").value("1"))
+                    .andExpect(jsonPath("$.items", hasSize(1)))
+                    .andExpect(jsonPath("$.totalAmount.amount").value(expectedTotalAmount.toString()))
+                    .andExpect(jsonPath("$.netAmount.amount").value(expectedNetAmount.toString()));
 
         }
 
         @Test
-        public void testWhenOneProductHasMultipleEligibleDeals() {
+        public void testWhenOneProductHasOneEligibleDealButBasketQuantityIsBelowDealMinimumQuantity() throws Exception {
+            var checkoutRequest = new CheckoutInBasketRequest();
+            var addProductRequest = new AddProductToBasketRequest(1, 2);
+
+            BigDecimal expectedTotalAmount = BigDecimal.valueOf(addProductRequest.quantity)
+                    .multiply(BigDecimal.valueOf(ProductStub.getById(addProductRequest.productId).price));
+
+            mockMvc.perform(addProductRequest.build());
+
+            mockMvc.perform(checkoutRequest.build())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.id").value("1"))
+                    .andExpect(jsonPath("$.items", hasSize(1)))
+                    .andExpect(jsonPath("$.totalAmount.amount").value(expectedTotalAmount.toString()))
+                    .andExpect(jsonPath("$.netAmount.amount").value(expectedTotalAmount.toString()));
+        }
+
+        @Test
+        public void testWhenOneProductHasOneEligibleDealButBasketQuantityIsAboveDealMaximumQuantity() throws Exception {
+            var checkoutRequest = new CheckoutInBasketRequest();
+            var addProductRequest = new AddProductToBasketRequest(1, 50);
+
+            BigDecimal expectedTotalAmount = BigDecimal.valueOf(addProductRequest.quantity)
+                    .multiply(BigDecimal.valueOf(ProductStub.getById(addProductRequest.productId).price));
+
+            mockMvc.perform(addProductRequest.build());
+
+            mockMvc.perform(checkoutRequest.build())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.id").value("1"))
+                    .andExpect(jsonPath("$.items", hasSize(1)))
+                    .andExpect(jsonPath("$.totalAmount.amount").value(expectedTotalAmount.toString()))
+                    .andExpect(jsonPath("$.netAmount.amount").value(expectedTotalAmount.toString()));
+        }
+
+        @Sql({"/multiple-percentage-deals-per-product.sql"})
+        @Test
+        public void testWhenOneProductHasMultipleEligibleDeals() throws Exception {
+            var checkoutRequest = new CheckoutInBasketRequest();
+            var addProductRequest = new AddProductToBasketRequest(1, 5);
+
+            BigDecimal expectedTotalAmount = BigDecimal.valueOf(addProductRequest.quantity)
+                    .multiply(BigDecimal.valueOf(ProductStub.getById(addProductRequest.productId).price));
+
+            BigDecimal expectedNetAmount = expectedTotalAmount.multiply(BigDecimal.valueOf(0.75));
+
+            mockMvc.perform(addProductRequest.build());
+
+            mockMvc.perform(checkoutRequest.build())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.id").value("1"))
+                    .andExpect(jsonPath("$.items", hasSize(1)))
+                    .andExpect(jsonPath("$.totalAmount.amount").value(expectedTotalAmount.toString()))
+                    .andExpect(jsonPath("$.netAmount.amount").value(expectedNetAmount.toString()));
 
         }
+
 
         @Test
         public void testWhenMultipleProductsHaveOneEligibleDealEach() {

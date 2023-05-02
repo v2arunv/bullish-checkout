@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-@Sql({"/test-schema.sql","/custom-data.sql"})
+@Sql({"/test-schema.sql", "/products.sql"})
 public class BasketCRUDIntegrationTest {
 
     @Autowired
