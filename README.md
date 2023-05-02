@@ -49,7 +49,7 @@ You can import `Bullish Assignment.postman_collection.json` into your local Post
 
 ## Areas for improvement
 
-1) When I started the `xxxOperations` where pretty lightweight and I liked how clear it was of additional logic, but as time went on, it's become a little too meaty.
+1) When I started the `xxxOperations` they were pretty lightweight and I liked how devoid it was of additional logic, but as time went on, it's become a little too meaty.
 2) I have to rely on `@DirtiesContext` since the data needs to be reset and I need JPA/Hibernate to flush/reset everytime. If we're expanding this further, I think I need to break it down more to allow for fewer resets
 3) The tests are huge and yes, there are pieces that are duplicated, but as mentioned in the requirements as well, I wanted the tests to be self-descriptive without having to surf through a lot of files to understand what the request/response is
 4) I prefer Integration Tests over unit tests because it allows you to test the state of the entire application and provide the exact input a user of the service would provide and validate against the output they would receive. That being said, there is a lot of value in Unit Testing and if I had a little more time and room, I would've invested in that as well

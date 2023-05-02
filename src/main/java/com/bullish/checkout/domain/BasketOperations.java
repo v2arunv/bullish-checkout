@@ -39,25 +39,6 @@ public class BasketOperations {
         return basket;
     }
 
-    public Basket saviorAddToBasket(Long basketId, Long productId, int quantity) {
-        if (quantity == 0) {
-            throw new InvalidQuantityArgumentException("Product quantity cannot be zero");
-        }
-
-        Basket basket = basketRepository.findById(basketId)
-                .orElseThrow((Supplier<BusinessException>) () -> new BasketNotFoundException(basketId));
-
-        Product product = productRepository.findById(productId)
-                .orElseThrow((Supplier<BusinessException>) () -> new ProductNotFoundException(productId));
-
-        BasketLineItem basketLineItem = new BasketLineItem.Builder(basket)
-                .product(product)
-                .quantity(quantity)
-                .build();
-
-        basketLineItemRepository.save(basketLineItem);
-        return basket;
-    }
 
     public Basket addToBasket(Long basketId, Long productId, int quantity) {
         if (quantity == 0) {
@@ -92,7 +73,6 @@ public class BasketOperations {
                 .item(basketLineItem)
                 .update();
 
-//        basket.save(basket);
         basketLineItemRepository.save(basketLineItem);
         return updatedBasket;
     }
