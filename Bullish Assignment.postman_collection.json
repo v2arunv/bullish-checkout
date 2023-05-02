@@ -26,6 +26,15 @@
 				},
 				"method": "POST",
 				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"productId\": 4,\n    \"dealType\": \"PERCENTAGE\",\n    \"discountPercentage\": 10,\n    \"minimumQuantity\": 1,\n    \"maximumQuantity\": 10\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
 				"url": {
 					"raw": "localhost:8080/deal",
 					"host": [
@@ -59,6 +68,15 @@
 				},
 				"method": "POST",
 				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"price\": 1000,\n    \"name\": \"PS5\"                                \n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
 				"url": {
 					"raw": "localhost:8080/product",
 					"host": [
@@ -93,14 +111,14 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:8080/product/1",
+					"raw": "localhost:8080/product/4",
 					"host": [
 						"localhost"
 					],
 					"port": "8080",
 					"path": [
 						"product",
-						"1"
+						"4"
 					]
 				}
 			},
@@ -127,13 +145,14 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "localhost:8080/product",
+					"raw": "localhost:8080/product/3",
 					"host": [
 						"localhost"
 					],
 					"port": "8080",
 					"path": [
-						"product"
+						"product",
+						"3"
 					]
 				}
 			},
@@ -160,7 +179,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:8080/deal?productId=-44",
+					"raw": "localhost:8080/deal?productId=4",
 					"host": [
 						"localhost"
 					],
@@ -171,7 +190,7 @@
 					"query": [
 						{
 							"key": "productId",
-							"value": "-44"
+							"value": "4"
 						}
 					]
 				}
@@ -200,7 +219,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"basketId\": 1,\n    \"productId\": 1,\n    \"quantity\": 5\n}",
+					"raw": "{\n    \"productId\": 4,\n    \"quantity\": 3\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -208,13 +227,14 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:8080/basket/product",
+					"raw": "localhost:8080/basket/1/product",
 					"host": [
 						"localhost"
 					],
 					"port": "8080",
 					"path": [
 						"basket",
+						"1",
 						"product"
 					]
 				}
@@ -243,7 +263,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"basketId\": 1,\n    \"productId\": 1,\n    \"quantity\": 3\n}",
+					"raw": "{\n    \"productId\": 4,\n    \"quantity\": 7\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -251,13 +271,14 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:8080/basket/product",
+					"raw": "localhost:8080/basket/1/product",
 					"host": [
 						"localhost"
 					],
 					"port": "8080",
 					"path": [
 						"basket",
+						"1",
 						"product"
 					]
 				}
@@ -286,7 +307,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"basketId\": 1,\n    \"productId\": 1\n}",
+					"raw": "{\n    \"productId\": 1\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -294,13 +315,14 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:8080/basket/product",
+					"raw": "localhost:8080/basket/1/product",
 					"host": [
 						"localhost"
 					],
 					"port": "8080",
 					"path": [
 						"basket",
+						"1",
 						"product"
 					]
 				}

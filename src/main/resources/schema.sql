@@ -35,5 +35,3 @@ CREATE TABLE basket_line_item (
     FOREIGN KEY (product_id) references product(id),
     FOREIGN KEY (basket_id) references basket(id)
 );
-
-alter sequence product_seq restart with 5;

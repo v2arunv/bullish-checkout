@@ -8,4 +8,5 @@ DELETE FROM basket;
 DELETE FROM basket_line_item;
 
 INSERT INTO product(id, name, price_amount,price_currency)
-VALUES (1, 'Macbook Pro', 1299, 'HKD');
+VALUES (500, 'Macbook Pro', 1299, 'HKD');
+

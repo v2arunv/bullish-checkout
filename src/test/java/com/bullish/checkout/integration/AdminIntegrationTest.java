@@ -177,19 +177,16 @@ public class AdminIntegrationTest {
                     .andExpect(jsonPath("$.price.amount").value(request.price))
                     .andExpect(jsonPath("$.name").value(request.name));
 
-            mockMvc.perform(MockMvcRequestBuilders
-                            .get("/product/%s".formatted(1)).with(httpBasic(username, password)))
-                    .andExpect(status().isOk());
         }
 
         @Test
         public void testDeleteAProduct() throws Exception {
-            Requests.DeleteProductRequest deleteProductRequest = new Requests.DeleteProductRequest(1, username, password);
+            Requests.DeleteProductRequest deleteProductRequest = new Requests.DeleteProductRequest(500, username, password);
             mockMvc.perform(deleteProductRequest.build())
                     .andExpect(status().isOk());
 
             mockMvc.perform(MockMvcRequestBuilders
-                    .get("/product/%s".formatted(1)).with(httpBasic(username, password)))
+                    .get("/product/%s".formatted(deleteProductRequest.id)).with(httpBasic(username, password)))
                     .andExpect(status().isNotFound());
         }
     }
