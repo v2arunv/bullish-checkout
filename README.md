@@ -1,15 +1,15 @@
 # Bullish Checkout
 
-Refer to **Bullish Technical Assessment.pdf** for the original requirements. This is a Spring Boot application that utilises Spring Security and in-memory DB to achieve the provided requirements. 
+Refer to **Bullish Technical Assessment.pdf** for the original requirements. This is a Spring Boot application that utilises Spring Security and am in-memory DB to achieve the provided requirements. 
 
 For your convenience, you can run `run.sh` which is a helper script that can add products and deals into a running instance of the web application. 
 Please note you will have to run this every time you stop & start the app since none of the data is persisted.
 
-You can find the pre-loaded products and deals my look at `src/main/resources/data.sql`. You can use them for your testing. You can also just use the Postman collection directly.
+You can find the pre-loaded products and deals by looking at `src/main/resources/data.sql`. You can use them for your testing or you can also just use the Postman collection directly.
 
 ## Running the application
 
-This project uses docker and docker-compose, so please have that installed prior to running the command. The shell script, creates a docker image and then uses docker-compose to attach the container's port to your `localhost` 's 8080
+This project uses docker and docker-compose, so please have that installed prior to running the command. The shell script, uses the attached `gradlew` executable to create a docker image and then uses docker-compose to attach the container's port to your `localhost` 's 8080
 
 ```
 ./run.sh
@@ -45,7 +45,7 @@ Please include them in all your requests. Any **unauthenticated** requests will 
 You can import `Bullish Assignment.postman_collection.json` into your local Postman to get a collection of requests that can be used to interact with the system
 
 
-## Areas for improvment
+## Areas for improvement
 
 1) When I started the `xxxOperations` where pretty lightweight and I liked how clear it was of additional logic, but as time went on, it's become a little too meaty.
 2) I have to rely on DirtyContext since the data needs to be reset and I need JPA/Hibernate to flush/reset everytime. If we're expanding this further, I think I need to break it down more to allow for fewer resets
