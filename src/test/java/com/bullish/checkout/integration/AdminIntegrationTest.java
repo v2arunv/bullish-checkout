@@ -35,7 +35,7 @@ public class AdminIntegrationTest {
 
 
     @Nested
-    @Sql({"/reset-deals.sql"})
+    @Sql({"/test-schema.sql", "/products.sql", "/reset-deals.sql"})
     public class DealOperationsIntegrationTest {
 
         @Test
@@ -96,9 +96,9 @@ public class AdminIntegrationTest {
             mockMvc.perform(requestTwo.build());
             mockMvc.perform(deleteRequest.build());
 
-//            mockMvc.perform(MockMvcRequestBuilders
-//                    .get("/deal/%s".formatted(1)).with(httpBasic(username, password)))
-//                    .andExpect(status().isNotFound());
+            mockMvc.perform(MockMvcRequestBuilders
+                    .get("/deal/%s".formatted(1)).with(httpBasic(username, password)))
+                    .andExpect(status().isNotFound());
 
             mockMvc.perform(MockMvcRequestBuilders
                             .get("/deal?productId=%s".formatted(requestTwo.productId)).with(httpBasic(username, password)))
@@ -157,20 +157,45 @@ public class AdminIntegrationTest {
         }
     }
 
-    @Test
-    public void test401WhenAccessingWithoutBasicAuthenticationCredentials() throws Exception {
-        var request = MockMvcRequestBuilders.post("/product");
+    @Nested
+    @Sql("/reset-products.sql")
+    public class ProductAdminOperationsTest {
 
-        mockMvc.perform(request)
-                .andExpect(status().isUnauthorized());
+        @Test
+        public void test401WhenAccessingWithoutBasicAuthenticationCredentials() throws Exception {
+            var request = MockMvcRequestBuilders.post("/product");
+
+            mockMvc.perform(request)
+                    .andExpect(status().isUnauthorized());
+        }
+
+        @Test
+        public void testAddANewProduct() throws Exception {
+            String name = "PS5";
+            Requests.AddProductRequest request = new Requests.AddProductRequest(100, name, username, password);
+            mockMvc.perform(request.build())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.id").isNotEmpty())
+                    .andExpect(jsonPath("$.price.amount").value(request.price))
+                    .andExpect(jsonPath("$.name").value(request.name));
+
+            mockMvc.perform(MockMvcRequestBuilders
+                            .get("/product/%s".formatted(1)).with(httpBasic(username, password)))
+                    .andExpect(status().isOk());
+        }
+
+        @Test
+        public void testDeleteAProduct() throws Exception {
+            Requests.DeleteProductRequest deleteProductRequest = new Requests.DeleteProductRequest(1, username, password);
+            mockMvc.perform(deleteProductRequest.build())
+                    .andExpect(status().isOk());
+
+            mockMvc.perform(MockMvcRequestBuilders
+                    .get("/product/%s".formatted(1)).with(httpBasic(username, password)))
+                    .andExpect(status().isNotFound());
+        }
     }
 
-    @Test
-    public void test200WithAccessingWithBasicAuthenticationCredentials() throws Exception {
-        var request = MockMvcRequestBuilders.post("/product")
-                .with(httpBasic(username, password));
 
-        mockMvc.perform(request)
-                .andExpect(status().isOk());
-    }
+
 }

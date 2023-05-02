@@ -1,6 +1,5 @@
 package com.bullish.checkout.controller;
 
-import com.bullish.checkout.BusinessException;
 import com.bullish.checkout.Constants;
 import com.bullish.checkout.InvalidDealException;
 import com.bullish.checkout.ProductIdQueryParameterMissingException;
@@ -48,7 +47,7 @@ public class DealController {
     }
 
     @PostMapping
-    public DealResponseV1 addDeal(@RequestBody DealRequestV1 body) {
+    public DealResponseV1 addDeal(@RequestBody AddDealRequestV1 body) {
         if (body.getDealType() == null) {
             throw new InvalidDealException("Deal Type not provided");
         }
@@ -83,6 +82,6 @@ public class DealController {
     public void deleteDeal(@PathVariable("id") String id) {
 
         dealOperations.deleteDeal(Long.parseLong(id));
-        
+
     }
 }

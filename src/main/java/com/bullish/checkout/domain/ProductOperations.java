@@ -16,30 +16,20 @@ public class ProductOperations {
         this.productRepository = productRepository;
     }
 
-    public Product createProduct() {
+    public Product createProduct(String name, double price) {
 
         Product product = new Product.Builder()
-                .price(BigDecimal.valueOf(99.99))
-                .name("VVPods Pro")
+                .price(BigDecimal.valueOf(price))
+                .name(name)
                 .build();
 
         return productRepository.save(product);
     }
 
-    public String getProduct() {
-        StringBuilder result = new StringBuilder();
-        productRepository.findAll()
-                .forEach(prod -> {
-                    result
-                            .append(prod.toString())
-                            .append("\n");
-                });
 
-        return result.toString();
-    }
-
-    public String getProduct(String id) {
-        return productRepository.findById(Long.parseLong(id)).get().toString();
+    public Product getProduct(Long id) {
+        return productRepository.findById(id)
+                .orElseThrow((Supplier<BusinessException>) () -> new ProductNotFoundException(id));
     }
 
     public void deleteProduct(Long id) throws BusinessException {

@@ -18,18 +18,21 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public String getProduct(@PathVariable String id) {
-        return productOperations.getProduct(id);
+    public ProductResponseV1 getProduct(@PathVariable String id) {
+        return ProductResponseV1.from(productOperations.getProduct(Long.parseLong(id)));
     }
 
     @PostMapping
-    public String addProduct() {
-        return productOperations.createProduct().toString();
+    public ProductResponseV1 addProduct(@RequestBody AddProductRequestV1 request) {
+
+        return ProductResponseV1.from(
+                productOperations.createProduct(request.getName(), request.getPrice())
+        );
 
     }
 
-    @DeleteMapping
-    public void deleteProduct() {
-        productOperations.deleteProduct(1L);
+    @DeleteMapping("/{id}")
+    public void deleteProduct(@PathVariable String id) {
+        productOperations.deleteProduct(Long.parseLong(id));
     }
 }

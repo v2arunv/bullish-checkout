@@ -1,8 +1,6 @@
 package com.bullish.checkout.controller;
 
-import com.bullish.checkout.domain.Deal;
-
-public class DealRequestV1 {
+public class AddDealRequestV1 {
 
     private String dealType;
 

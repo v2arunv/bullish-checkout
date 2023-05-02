@@ -217,4 +217,65 @@ public class Requests {
                     .accept(MediaType.APPLICATION_JSON);
         }
     }
+
+    public static class AddProductRequest {
+        public double price;
+        public String name;
+        private String username;
+        private String password;
+
+        public AddProductRequest(
+                double price,
+                String name,
+                String username,
+                String password
+        ) {
+            this.price = price;
+            this.name = name;
+            this.username = username;
+            this.password = password;
+        }
+
+        public MockHttpServletRequestBuilder build() {
+            return MockMvcRequestBuilders
+                    .post("/product")
+                    .content("""
+                            {
+                                "price": %s,
+                                "name": "%s"                                
+                            }
+                            """.formatted(
+                            this.price,
+                            this.name
+                    ))
+                    .with(httpBasic(username, password))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON);
+        }
+    }
+
+    public static class DeleteProductRequest {
+        public int id;
+        String username;
+        String password;
+
+        public DeleteProductRequest(
+                int productId,
+                String username,
+                String password
+        ) {
+            this.id = productId;
+            this.username = username;
+            this.password = password;
+        }
+
+        public MockHttpServletRequestBuilder build() {
+            return MockMvcRequestBuilders
+                    .delete("/product/%s" .formatted(this.id))
+                    .with(httpBasic(username, password))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON);
+        }
+    }
+
 }
