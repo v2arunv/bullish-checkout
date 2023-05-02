@@ -4,6 +4,7 @@ import com.bullish.checkout.domain.Product;
 
 public class ProductStubs {
     private static Long[] ids = new Long[]{1L, 2L, 3L};
+    public static Long INVALID_ID = 1000L;
     private static String[] names = new String[]{
             "Macbook Pro",
             "iPhone",
