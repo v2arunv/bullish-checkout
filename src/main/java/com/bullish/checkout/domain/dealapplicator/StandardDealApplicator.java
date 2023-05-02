@@ -31,9 +31,12 @@ public class StandardDealApplicator implements DealApplicator {
          */
         Money startingDiscount = Money.of(0, Constants.DEFAULT_CURRENCY);
 
-        // Calculate total discount
-        Money totalDiscount = basketCheckout.getLineItemWithDeals().stream()
-                .reduce(startingDiscount, this::calculateLineItemDiscount, Money::add);
+        // Calculate total discount by applying discount per line item and then summing it up
+        Money totalDiscount = basketCheckout
+                .getLineItemWithDeals()
+                .stream()
+                .map(this::calculateLineItemDiscount)
+                .reduce(startingDiscount, Money::add);
 
         // Calculate net amount for basket
         Money netAmount =  basketCheckout.getTotalAmount().subtract(totalDiscount);
@@ -44,7 +47,7 @@ public class StandardDealApplicator implements DealApplicator {
 
     }
 
-    private Money calculateLineItemDiscount(Money amount, BasketLineItemWithDeal basketLineItemWithDeal) {
+    private Money calculateLineItemDiscount(BasketLineItemWithDeal basketLineItemWithDeal) {
         // We can change startingDiscount to something else in case, we want to offer a blanket discount for a line item
         Money startingDiscount = Money.of(0, Constants.DEFAULT_CURRENCY);
 
@@ -56,11 +59,19 @@ public class StandardDealApplicator implements DealApplicator {
             But for simplicity and since no explicit requirement was given, let's just go with #1
          */
 
-        return basketLineItemWithDeal.getDeals()
+        Money discount = basketLineItemWithDeal.getDeals()
                 .stream()
                 .map(deal -> this.applyDealOnLineItem(deal, basketLineItemWithDeal))
                 .max(this::pickHighestDiscount)
                 .orElse(startingDiscount);
+
+
+        // Subtract for each line item's net amount
+        basketLineItemWithDeal.setDiscountedPrice(
+                basketLineItemWithDeal.getOriginalPrice().subtract(discount)
+        );
+
+        return discount;
     }
 
     private int pickHighestDiscount(Money discount1, Money discount2) {
@@ -96,10 +107,7 @@ public class StandardDealApplicator implements DealApplicator {
             return basketLineItemWithDeal.getOriginalPrice();
         }
 
-        basketLineItemWithDeal.setDiscountedPrice(
-                basketLineItemWithDeal.getOriginalPrice()
-                        .subtract(discount)
-        );
+
         return discount;
 
     }

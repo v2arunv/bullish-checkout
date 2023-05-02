@@ -30,12 +30,14 @@ public class CheckoutIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @BeforeEach
+    public void createBasket() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/basket"));
+    }
+
+
     @Nested
     public class SimpleCheckoutWithNoDeals {
-        @BeforeEach
-        public void createBasket() throws Exception {
-            mockMvc.perform(MockMvcRequestBuilders.post("/basket"));
-        }
 
         @Test
         public void testWhenNoProductsAreAdded() throws Exception {
@@ -120,10 +122,6 @@ public class CheckoutIntegrationTest {
     @Nested
     @Sql({"/single-percentage-deals-per-product.sql"})
     public class CheckoutWithPercentageDiscountDeals {
-        @BeforeEach
-        public void createBasket() throws Exception {
-            mockMvc.perform(MockMvcRequestBuilders.post("/basket"));
-        }
 
         @Test
         public void testWhenOneProductHasOneEligibleDeal() throws Exception {
@@ -182,7 +180,67 @@ public class CheckoutIntegrationTest {
                     .andExpect(jsonPath("$.netAmount.amount").value(expectedTotalAmount.toString()));
         }
 
-        @Sql({"/multiple-percentage-deals-per-product.sql"})
+
+
+        @Test
+        public void testWhenMultipleProductsHaveOneEligibleDealEach() throws Exception {
+            var checkoutRequest = new CheckoutInBasketRequest();
+            var addProductRequestOne = new AddProductToBasketRequest(1, 10);
+            var addProductRequestTwo = new AddProductToBasketRequest(2, 10);
+
+            BigDecimal expectedTotalAmount =
+                    BigDecimal.valueOf(addProductRequestOne.quantity).multiply(BigDecimal.valueOf(ProductStub.getById(addProductRequestOne.productId).price))
+                            .add(BigDecimal.valueOf(addProductRequestTwo.quantity).multiply(BigDecimal.valueOf(ProductStub.getById(addProductRequestTwo.productId).price)
+                    ));
+
+
+            mockMvc.perform(addProductRequestOne.build());
+            mockMvc.perform(addProductRequestTwo.build());
+
+            mockMvc.perform(checkoutRequest.build())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.id").value("1"))
+                    .andExpect(jsonPath("$.items", hasSize(2)))
+                    .andExpect(jsonPath("$.items[*].product.price").hasJsonPath())
+                    .andExpect(jsonPath("$.items[*].product.price.amount").hasJsonPath())
+                    .andExpect(jsonPath("$.items[*].product.price.currency").hasJsonPath())
+                    .andExpect(jsonPath("$.items[*].product.name").hasJsonPath())
+                    .andExpect(jsonPath("$.items[*].quantity").hasJsonPath())
+                    // check line items
+                    .andExpect(jsonPath("$.items[*].product.id").value(
+                            containsInAnyOrder(
+                                    addProductRequestOne.productId,
+                                    addProductRequestTwo.productId
+                            )
+                    ))
+                    .andExpect(jsonPath("$.items[*].product.price.amount").value(
+                            containsInAnyOrder(
+                                    String.valueOf(ProductStub.getById(addProductRequestOne.productId).price),
+                                    String.valueOf(ProductStub.getById(addProductRequestTwo.productId).price)
+                            )
+                    ))
+                    .andExpect(jsonPath("$.items[*].product.name").value(
+                            containsInAnyOrder(
+                                    ProductStub.getById(addProductRequestOne.productId).name,
+                                    ProductStub.getById(addProductRequestTwo.productId).name
+                            )
+                    ))
+                    .andExpect(jsonPath("$.items[*].quantity").value(
+                            containsInAnyOrder(addProductRequestOne.quantity, addProductRequestTwo.quantity)
+                    ))
+                    // check total and net amounts per line item and in total
+                    .andExpect(jsonPath("$.items[*].netAmount.amount").value(
+                            containsInAnyOrder(
+                                    BigDecimal.valueOf(8991).toString(),
+                                    BigDecimal.valueOf(6495).toString()
+                            )
+                    ))
+                    .andExpect(jsonPath("$.totalAmount.amount").value(expectedTotalAmount.toString()))
+                    .andExpect(jsonPath("$.netAmount.amount").value(BigDecimal.valueOf(15486).toString()));
+
+        }
+
+        @Sql({"/multiple-percentage-deals-for-single-product.sql"})
         @Test
         public void testWhenOneProductHasMultipleEligibleDeals() throws Exception {
             var checkoutRequest = new CheckoutInBasketRequest();
@@ -204,34 +262,234 @@ public class CheckoutIntegrationTest {
 
         }
 
-
+        @Sql({"/multiple-percentage-deals-for-multiple-products.sql"})
         @Test
-        public void testWhenMultipleProductsHaveOneEligibleDealEach() {
+        public void testWhenMultipleProductsHaveMultipleEligibleDealsEach() throws Exception{
 
-        }
+            var checkoutRequest = new CheckoutInBasketRequest();
+            var addProductRequestOne = new AddProductToBasketRequest(1, 10);
+            var addProductRequestTwo = new AddProductToBasketRequest(2, 10);
 
-        @Test
-        public void testWhenMultipleProductsHaveMultipleEligibleDealsEach() {
+            BigDecimal expectedTotalAmount =
+                    BigDecimal.valueOf(addProductRequestOne.quantity).multiply(BigDecimal.valueOf(ProductStub.getById(addProductRequestOne.productId).price))
+                            .add(BigDecimal.valueOf(addProductRequestTwo.quantity).multiply(BigDecimal.valueOf(ProductStub.getById(addProductRequestTwo.productId).price)
+                            ));
+
+            mockMvc.perform(addProductRequestOne.build());
+            mockMvc.perform(addProductRequestTwo.build());
+
+            mockMvc.perform(checkoutRequest.build())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.id").value("1"))
+                    .andExpect(jsonPath("$.items", hasSize(2)))
+                    .andExpect(jsonPath("$.items[*].product.price").hasJsonPath())
+                    .andExpect(jsonPath("$.items[*].product.price.amount").hasJsonPath())
+                    .andExpect(jsonPath("$.items[*].product.price.currency").hasJsonPath())
+                    .andExpect(jsonPath("$.items[*].product.name").hasJsonPath())
+                    .andExpect(jsonPath("$.items[*].quantity").hasJsonPath())
+                    // check line items
+                    .andExpect(jsonPath("$.items[*].product.id").value(
+                            containsInAnyOrder(
+                                    addProductRequestOne.productId,
+                                    addProductRequestTwo.productId
+                            )
+                    ))
+                    .andExpect(jsonPath("$.items[*].product.price.amount").value(
+                            containsInAnyOrder(
+                                    String.valueOf(ProductStub.getById(addProductRequestOne.productId).price),
+                                    String.valueOf(ProductStub.getById(addProductRequestTwo.productId).price)
+                            )
+                    ))
+                    .andExpect(jsonPath("$.items[*].product.name").value(
+                            containsInAnyOrder(
+                                    ProductStub.getById(addProductRequestOne.productId).name,
+                                    ProductStub.getById(addProductRequestTwo.productId).name
+                            )
+                    ))
+                    .andExpect(jsonPath("$.items[*].quantity").value(
+                            containsInAnyOrder(addProductRequestOne.quantity, addProductRequestTwo.quantity)
+                    ))
+                    // check total and net amounts per line item and in total
+                    .andExpect(jsonPath("$.items[*].netAmount.amount").value(
+                            containsInAnyOrder(
+                                    BigDecimal.valueOf(9742.5).toString(),
+                                    BigDecimal.valueOf(6993).toString()
+                            )
+                    ))
+                    .andExpect(jsonPath("$.totalAmount.amount").value(expectedTotalAmount.toString()))
+                    .andExpect(jsonPath("$.netAmount.amount").value(BigDecimal.valueOf(16735.5).toString()));
 
         }
     }
 
     @Nested
+    @Sql({"/single-flat-discount-deals-per-product.sql"})
     public class CheckoutWithFlatDiscountDeals {
         @Test
-        public void testWhenOneProductHasOneEligibleDeal() {
+        public void testWhenOneProductHasOneEligibleDeal() throws Exception {
+            var checkoutRequest = new CheckoutInBasketRequest();
+            var addProductRequest = new AddProductToBasketRequest(1, 5);
 
+            BigDecimal expectedTotalAmount = BigDecimal.valueOf(addProductRequest.quantity)
+                    .multiply(BigDecimal.valueOf(ProductStub.getById(addProductRequest.productId).price));
+
+            BigDecimal expectedNetAmount = expectedTotalAmount.subtract(BigDecimal.valueOf(500));
+
+            mockMvc.perform(addProductRequest.build());
+
+            mockMvc.perform(checkoutRequest.build())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.id").value("1"))
+                    .andExpect(jsonPath("$.items", hasSize(1)))
+                    .andExpect(jsonPath("$.totalAmount.amount").value(expectedTotalAmount.toString()))
+                    .andExpect(jsonPath("$.netAmount.amount").value(expectedNetAmount.toString()));
         }
 
         @Test
-        public void testWhenOneProductHasMultipleEligibleDeals() {
+        public void testWhenMultipleProductsHaveOneEligibleDealEach() throws Exception {
+            var checkoutRequest = new CheckoutInBasketRequest();
+            var addProductRequestOne = new AddProductToBasketRequest(1, 10);
+            var addProductRequestTwo = new AddProductToBasketRequest(2, 10);
 
+            BigDecimal expectedTotalAmount =
+                    BigDecimal.valueOf(addProductRequestOne.quantity).multiply(BigDecimal.valueOf(ProductStub.getById(addProductRequestOne.productId).price))
+                            .add(BigDecimal.valueOf(addProductRequestTwo.quantity).multiply(BigDecimal.valueOf(ProductStub.getById(addProductRequestTwo.productId).price)
+                            ));
+
+
+            mockMvc.perform(addProductRequestOne.build());
+            mockMvc.perform(addProductRequestTwo.build());
+
+            mockMvc.perform(checkoutRequest.build())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.id").value("1"))
+                    .andExpect(jsonPath("$.items", hasSize(2)))
+                    .andExpect(jsonPath("$.items[*].product.price").hasJsonPath())
+                    .andExpect(jsonPath("$.items[*].product.price.amount").hasJsonPath())
+                    .andExpect(jsonPath("$.items[*].product.price.currency").hasJsonPath())
+                    .andExpect(jsonPath("$.items[*].product.name").hasJsonPath())
+                    .andExpect(jsonPath("$.items[*].quantity").hasJsonPath())
+                    // check line items
+                    .andExpect(jsonPath("$.items[*].product.id").value(
+                            containsInAnyOrder(
+                                    addProductRequestOne.productId,
+                                    addProductRequestTwo.productId
+                            )
+                    ))
+                    .andExpect(jsonPath("$.items[*].product.price.amount").value(
+                            containsInAnyOrder(
+                                    String.valueOf(ProductStub.getById(addProductRequestOne.productId).price),
+                                    String.valueOf(ProductStub.getById(addProductRequestTwo.productId).price)
+                            )
+                    ))
+                    .andExpect(jsonPath("$.items[*].product.name").value(
+                            containsInAnyOrder(
+                                    ProductStub.getById(addProductRequestOne.productId).name,
+                                    ProductStub.getById(addProductRequestTwo.productId).name
+                            )
+                    ))
+                    .andExpect(jsonPath("$.items[*].quantity").value(
+                            containsInAnyOrder(addProductRequestOne.quantity, addProductRequestTwo.quantity)
+                    ))
+                    // check total and net amounts per line item and in total
+                    .andExpect(jsonPath("$.items[*].netAmount.amount").value(
+                            containsInAnyOrder(
+                                    BigDecimal.valueOf(9890).toString(),
+                                    BigDecimal.valueOf(12490).toString()
+                            )
+                    ))
+                    .andExpect(jsonPath("$.totalAmount.amount").value(expectedTotalAmount.toString()))
+                    .andExpect(jsonPath("$.netAmount.amount").value(BigDecimal.valueOf(22380).toString()));
+
+        }
+
+
+        @Test
+        public void testWithOneProductWhoseFlatDiscountIsGreaterThanLineItemPrice() throws Exception {
+            var checkoutRequest = new CheckoutInBasketRequest();
+            var addProductRequest = new AddProductToBasketRequest(3, 5);
+            var addProductRequestTwo = new AddProductToBasketRequest(2, 10);
+
+
+            BigDecimal expectedTotalAmount = BigDecimal.valueOf(addProductRequest.quantity)
+                    .multiply(BigDecimal.valueOf(ProductStub.getById(addProductRequest.productId).price));
+
+            BigDecimal expectedNetAmount = BigDecimal.ZERO;
+
+            mockMvc.perform(addProductRequest.build());
+
+            mockMvc.perform(checkoutRequest.build())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.id").value("1"))
+                    .andExpect(jsonPath("$.items", hasSize(1)))
+                    .andExpect(jsonPath("$.totalAmount.amount").value(expectedTotalAmount.toString()))
+                    .andExpect(jsonPath("$.netAmount.amount").value(expectedNetAmount.toString()));
         }
 
         @Test
-        public void testWhenMultipleProductsHaveOneEligibleDealEach() {
+        public void testWhenMultipleProductsButOnProductWhoseFlatDiscountIsGreaterThanLineItemPrice() throws Exception {
+            var checkoutRequest = new CheckoutInBasketRequest();
+            var addProductRequestOne = new AddProductToBasketRequest(3, 10);
+            var addProductRequestTwo = new AddProductToBasketRequest(2, 10);
+
+            BigDecimal expectedTotalAmount =
+                    BigDecimal.valueOf(addProductRequestOne.quantity).multiply(BigDecimal.valueOf(ProductStub.getById(addProductRequestOne.productId).price))
+                            .add(BigDecimal.valueOf(addProductRequestTwo.quantity).multiply(BigDecimal.valueOf(ProductStub.getById(addProductRequestTwo.productId).price)
+                            ));
+
+            mockMvc.perform(addProductRequestOne.build());
+            mockMvc.perform(addProductRequestTwo.build());
+
+            mockMvc.perform(checkoutRequest.build())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.id").value("1"))
+                    .andExpect(jsonPath("$.items", hasSize(2)))
+                    .andExpect(jsonPath("$.items[*].product.price").hasJsonPath())
+                    .andExpect(jsonPath("$.items[*].product.price.amount").hasJsonPath())
+                    .andExpect(jsonPath("$.items[*].product.price.currency").hasJsonPath())
+                    .andExpect(jsonPath("$.items[*].product.name").hasJsonPath())
+                    .andExpect(jsonPath("$.items[*].quantity").hasJsonPath())
+                    // check line items
+                    .andExpect(jsonPath("$.items[*].product.id").value(
+                            containsInAnyOrder(
+                                    addProductRequestOne.productId,
+                                    addProductRequestTwo.productId
+                            )
+                    ))
+                    .andExpect(jsonPath("$.items[*].product.price.amount").value(
+                            containsInAnyOrder(
+                                    String.valueOf(ProductStub.getById(addProductRequestOne.productId).price),
+                                    String.valueOf(ProductStub.getById(addProductRequestTwo.productId).price)
+                            )
+                    ))
+                    .andExpect(jsonPath("$.items[*].product.name").value(
+                            containsInAnyOrder(
+                                    ProductStub.getById(addProductRequestOne.productId).name,
+                                    ProductStub.getById(addProductRequestTwo.productId).name
+                            )
+                    ))
+                    .andExpect(jsonPath("$.items[*].quantity").value(
+                            containsInAnyOrder(addProductRequestOne.quantity, addProductRequestTwo.quantity)
+                    ))
+                    // check total and net amounts per line item and in total
+                    .andExpect(jsonPath("$.items[*].netAmount.amount").value(
+                            containsInAnyOrder(
+                                    BigDecimal.ZERO.toString(),
+                                    BigDecimal.valueOf(9890).toString()
+                            )
+                    ))
+                    .andExpect(jsonPath("$.totalAmount.amount").value(expectedTotalAmount.toString()))
+                    .andExpect(jsonPath("$.netAmount.amount").value(BigDecimal.valueOf(9890).toString()));
 
         }
+
+
+        @Test
+        public void testWhenOneProductHasMultipleEligibleDeals() throws Exception {
+
+        }
+
+
 
         @Test
         public void testWhenMultipleProductsHaveMultipleEligibleDealsEach() {
