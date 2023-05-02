@@ -1,0 +1,7 @@
+version: "3.9"
+services:
+  server:
+    image: "com.bullish.checkout"
+    ports:
+      - "8080:8080"
+
