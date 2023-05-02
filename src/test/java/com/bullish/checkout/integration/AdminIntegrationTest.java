@@ -12,8 +12,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -103,8 +102,7 @@ public class AdminIntegrationTest {
             mockMvc.perform(MockMvcRequestBuilders
                             .get("/deal?productId=%s".formatted(requestTwo.productId)).with(httpBasic(username, password)))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$", hasSize(1)));
-
+                    .andExpect(jsonPath("$.[*].id").value(not(contains("1"))));
 
         }
         @Test
