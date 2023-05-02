@@ -87,4 +87,19 @@ public class Requests {
                     .accept(MediaType.APPLICATION_JSON);
         }
     }
+
+    public static class CheckoutInBasketRequest {
+        public int basketId;
+
+        public CheckoutInBasketRequest() {
+            this.basketId = 1;
+        }
+
+        public MockHttpServletRequestBuilder build() {
+            return MockMvcRequestBuilders
+                    .post("/basket/%s/checkout".formatted(this.basketId))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON);
+        }
+    }
 }

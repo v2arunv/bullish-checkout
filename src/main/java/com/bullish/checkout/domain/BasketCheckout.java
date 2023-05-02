@@ -43,12 +43,12 @@ public class BasketCheckout {
     }
 
     public Money calculateTotalAmount() {
-        return this.lineItemWithDeals.stream()
-                .reduce(
-                        Money.of(0, Constants.DEFAULT_CURRENCY),
-                        (money, item) -> item.getOriginalPrice(),
-                        Money::add
-                );
+        Money amount = Money.of(0, Constants.DEFAULT_CURRENCY);
+        return this.lineItemWithDeals
+                .stream()
+                .map(BasketLineItemWithDeal::getOriginalPrice)
+                .reduce(amount, Money::add);
+
     }
 
     @Override
